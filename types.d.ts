@@ -16,4 +16,5 @@ type Photo = {
     createdAt: Date
 }
 
+
 export {User, Photo}

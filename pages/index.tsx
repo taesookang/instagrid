@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { auth } from "../firebase/auth";
+import { auth } from "../firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 export default function Home() {
@@ -18,7 +18,6 @@ export default function Home() {
 
   console.log(user);
   
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { auth } from "../../firebase";
 import { InputField, SubmitButton, Seperator } from ".";
 import { AiFillFacebook } from "react-icons/ai";
 import { useRouter } from "next/router";
+import { auth, db, signInWithFacebook } from "../../firebase";
 import {
   createUserWithEmailAndPassword,
   AuthErrorCodes,
+  onAuthStateChanged
 } from "firebase/auth";
 import {
   collection,
@@ -16,20 +17,24 @@ import {
 } from "firebase/firestore";
 import Image from "next/image";
 import { User } from "../../types";
-import { db } from "../../firebase";
+
 const SignUpForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
 
-  const [newUser, setNewUser] = useState<User | null>(null);
-
   const router = useRouter();
+
+  onAuthStateChanged(auth, (user) => {
+    if(user) {
+      router.push("/")
+    }
+  })
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    signUp(email, password);
+    signUp(email, password)
   };
 
   const signUp = async (email: string, password: string) => {
@@ -54,13 +59,10 @@ const SignUpForm: React.FC = () => {
           };
 
           try {
-            const docRef = await addDoc(collection(db, "users"), modifiedUser);
-
-            console.log("Document written with ID: ", docRef.id);
+            await addDoc(collection(db, "users"), modifiedUser);
           } catch (err) {
             console.error("Error adding document: ", err);
           }
-          router.push("/");
         })
         .catch((err) => {
           console.log(err.message);
@@ -86,7 +88,7 @@ const SignUpForm: React.FC = () => {
           <h1 className="text-lg w-[268px] text-center leading-5 font-[500] text-gray-400 mb-4">
             Sign up to see photos and videos from your friends.
           </h1>
-          <div className="w-[278px] px-2 py-[5px] rounded-md flex items-center justify-center text-white bg-button-primary font-[500] cursor-pointer">
+          <div onClick={signInWithFacebook} className="w-[278px] px-2 py-[5px] rounded-md flex items-center justify-center text-white bg-button-primary font-[500] cursor-pointer">
             <AiFillFacebook className="mr-2 w-5 h-5" color="#ffffff" />
             <p>Log in with Facebook</p>
           </div>

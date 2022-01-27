@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { auth } from "../../firebase";
+import React, { useState } from "react";
+import { auth, signInWithFacebook } from "../../firebase";
 import { InputField, SubmitButton, Seperator } from ".";
 import { AiFillFacebook } from "react-icons/ai";
 import { useRouter } from "next/router";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
 
 const LoginForm: React.FC = () => {
@@ -13,6 +13,12 @@ const LoginForm: React.FC = () => {
 
   const router = useRouter();
 
+  onAuthStateChanged(auth, (user) => {
+    if(user) {
+      router.push("/")
+    }
+  })
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     login(email, password);
@@ -20,10 +26,6 @@ const LoginForm: React.FC = () => {
 
   const login = (email: string, password: string) => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredencial) => {
-        const user = userCredencial.user;
-        router.push("/");
-      })
       .catch((err) => {
         console.log(err.message);
         setError(true);
@@ -63,7 +65,7 @@ const LoginForm: React.FC = () => {
               <br /> Please check your email and password.
             </div>
           )}
-          <div className="flex items-center text-ocean font-[500] my-3 cursor-pointer">
+          <div onClick={signInWithFacebook} className="flex items-center text-ocean font-[500] my-3 cursor-pointer">
             <AiFillFacebook className="mr-2 w-5 h-5" color="#375185" />
             <p>Log in with Facebook</p>
           </div>
