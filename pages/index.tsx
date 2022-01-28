@@ -1,23 +1,27 @@
+import { ReactElement, useEffect } from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { auth } from "../firebase";
-import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { Layout } from "../components/layout";
+import { auth, db } from "../firebase";
+import { User } from "../types";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 export default function Home() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      router.push("/accounts/login");
-    } else {
-      setUser(user);
-    }
-  });
-
-  console.log(user);
+  useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.push("/accounts/login");
+      } else {
+        console.log(user.uid);
+      }
+    });
+  }, [auth]);
   
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
@@ -25,7 +29,6 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div>{user?.uid}</div>
       <button
         onClick={() => signOut(auth).then(() => router.push("/accounts/login"))}
       >
@@ -34,3 +37,7 @@ export default function Home() {
     </div>
   );
 }
+
+Home.getLayout = function getLayout(page: ReactElement) {
+  return <Layout>{page}</Layout>;
+};
