@@ -2,34 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap");
 html,
 body {
   padding: 0;
   margin: 0;
-  font-family: 'Roboto', sans-serif;
-  &:before{
-    content:'';
-    content: "";
-    width: 100%;
-    // height: calc(100vh - 60px);
-    background: #FAFAFA;
-    // background-image: url("../public/bg.jpg");
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    z-index: -1;
-  }
+  font-family: "Roboto", sans-serif;
+  color: #262626;
 }
 
 .border-box {
-    border: 1px solid #dbdbdb;
+  border: 1px solid #dbdbdb;
 }
 
 input {
-    background-color: #FAFAFA;
-    &:focus {
-        outline: none !important;
-        border:1px solid #bdbdbd;
-    }
+  background-color: #fafafa;
+  &:focus {
+    outline: none !important;
+    border: 1px solid #bdbdbd;
+  }
+}
+
+.post {
+  @extend .border-box;
+  background-color: #ffffff;
+  width: 100%;
+  height: fit-content;
+  border-radius: 2px;
+}
+
+span,
+p {
+  letter-spacing: 0.025em;
+}
+
+.modal-create {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background-color: #ffffff;
+
+  &__overlay {
+    position: fixed;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
 }

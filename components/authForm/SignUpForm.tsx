@@ -10,7 +10,8 @@ import {
 } from "firebase/auth";
 import {
   collection,
-  addDoc,
+  setDoc,
+  doc,
   query,
   where,
   getDocs,
@@ -50,8 +51,8 @@ const SignUpForm: React.FC = () => {
         .then(async (userCredencial) => {
           const user = userCredencial.user;
           const modifiedUser: User = {
-            id: user.uid,
             email: user.email,
+            excerpt: null,
             username: username,
             photoUrl: user.photoURL,
             followers: [],
@@ -59,7 +60,7 @@ const SignUpForm: React.FC = () => {
           };
 
           try {
-            await addDoc(collection(db, "users"), modifiedUser);
+            await setDoc(doc(db, "users", user.uid), modifiedUser);
           } catch (err) {
             console.error("Error adding document: ", err);
           }
