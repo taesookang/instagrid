@@ -9,10 +9,18 @@ body {
   margin: 0;
   font-family: "Roboto", sans-serif;
   color: #262626;
+  min-height: 100% !important;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .border-box {
   border: 1px solid #dbdbdb;
+}
+
+section {
+  min-height: calc(100vh - 60px);
+  width: 100%;
 }
 
 input {
@@ -20,6 +28,16 @@ input {
   &:focus {
     outline: none !important;
     border: 1px solid #bdbdbd;
+  }
+}
+
+textarea {
+  resize: none;
+  &:focus {
+    outline: none;
+  }
+  &::placeholder {
+    color: rgb(156 163 175);
   }
 }
 
@@ -54,4 +72,35 @@ p {
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.8);
   }
+}
+
+.modal-post {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__overlay {
+    position: fixed;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 64px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+
+.triangle {
+  width: 0; 
+  height: 0; 
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 10px solid white;
+  
 }

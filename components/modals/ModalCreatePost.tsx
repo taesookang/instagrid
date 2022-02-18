@@ -1,51 +1,43 @@
-import React, { useState, useEffect } from "react";
+// General
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { IPost } from "../../types";
+import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
+// Icons
+import { IoClose } from "react-icons/io5";
+import { HiOutlineArrowLeft } from "react-icons/hi";
+import { BsCheckCircleFill } from "react-icons/bs";
+// Dependencies
+import Carousel from "react-multi-carousel";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
-import { IoClose } from "react-icons/io5";
-import { HiOutlineArrowLeft, HiOutlineEmojiHappy } from "react-icons/hi";
-import { BsCheckCircleFill } from "react-icons/bs";
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
-import { storage, db, auth } from "../../../firebase";
+import { v4 as uuidv4 } from "uuid";
+// Firebase
+import { storage, db, auth } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
-import { v4 as uuidv4 } from "uuid";
-import { Post } from "../../../types";
-import CustomArrows from './custom/customArrows';
-import CustomDots from "./custom/customDots";
 
-
-
-const responsive = {
-  desktop: {
-    breakpoint: { max: 3000, min: 1024 },
-    items: 1,
-  },
-  tablet: {
-    breakpoint: { max: 1024, min: 464 },
-    items: 1,
-  },
-  mobile: {
-    breakpoint: { max: 464, min: 0 },
-    items: 1,
-  },
-};
+// Auth
+import { useAuth } from "../../context/AuthContext";
 
 Modal.setAppElement("#__next");
-interface Props {}
 
-export const ModalCreatePost: React.FC<Props> = () => {
+interface Props {
+  isOpen: boolean
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+
+
+export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadIsDone, setUploadIsDone] = useState(false);
   const [openCaptionInput, setOpenCaptionInput] = useState(false);
   const [caption, setCaption] = useState("");
 
-  useEffect(() => {
-    console.log(caption.length);
-  }, [caption]);
+  const { currentUser } = useAuth();
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -54,49 +46,50 @@ export const ModalCreatePost: React.FC<Props> = () => {
 
   const uploadPost = async () => {
     setOpenCaptionInput(false);
-    const newPost: Post = {
+    const newPost: IPost = {
       id: uuidv4(),
-      userId: auth.currentUser?.uid,
+      userId: currentUser?.id!,
+      userPhotoUrl: currentUser?.photoUrl!,
+      username: currentUser?.username!,
       photos: [],
       likes: [],
       comments: [],
-      createAt: Date.now(),
+      createdAt: Date.now(),
       caption: caption,
     };
 
     const postDoc = doc(db, "posts", newPost.id);
-    await setDoc(postDoc, newPost)
-      .then(() => {
-        selectedFiles.map((file) => {
-          const imageId = uuidv4();
-          const storageRef = ref(storage, `images/${imageId}`);
-          uploadBytes(storageRef, file)
-            .then((snapshot) => {
-              getDownloadURL(snapshot.ref).then((url) => {
-                updateDoc(postDoc, {
-                  photos: arrayUnion(url),
-                });
-              });
+    selectedFiles.map((file) => {
+      const imageId = uuidv4();
+      const storageRef = ref(storage, `images/${imageId}`);
+      uploadBytes(storageRef, file)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              newPost.photos.push(url);
             })
-            .catch((err) => console.log(err));
-        });
-      })
-      .then(() => {
-        setSelectedFiles([]);
-        setUploadIsDone(true);
-      })
-      .catch((err) => console.log(err));
+            .then(async () => {
+              await setDoc(postDoc, newPost);
+            });
+        })
+        .catch((err) => console.log(err));
+    });
+
+    setSelectedFiles([]);
+    setUploadIsDone(true);
   };
+
 
   return (
     <Modal
-      isOpen={!!router.query.create}
-      onAfterClose={() => {
+      isOpen={isOpen}
+      onRequestClose={() => {
+        setIsOpen(false)
         setSelectedFiles([]);
         setUploadIsDone(false);
         setOpenCaptionInput(false);
+        setCaption("");
       }}
-      onRequestClose={() => router.push("/")}
       contentLabel="Create Post"
       className={`absolute bg-white ${
         openCaptionInput
@@ -106,7 +99,7 @@ export const ModalCreatePost: React.FC<Props> = () => {
       overlayClassName="modal-create__overlay"
     >
       <IoClose
-        onClick={() => router.back()}
+        onClick={() => setIsOpen(false)}
         className="fixed top-4 right-4 text-white w-10 h-10 cursor-pointer"
       />
       <div className="h-11 w-full flex items-center justify-between border-b border-gray-200 font-[500]">
@@ -152,19 +145,18 @@ export const ModalCreatePost: React.FC<Props> = () => {
           ) : selectedFiles.length ? (
             <Carousel
               swipeable={true}
-              showDots={true}
-              responsive={responsive}
+              showDots={selectedFiles.length > 1}
+              responsive={carouselResponsive}
               keyBoardControl={true}
               customTransition="all .01"
               containerClass="carousel-container w-full"
               removeArrowOnDeviceType={["mobile"]}
-              dotListClass=""
               itemClass="relative w-full h-full"
-              customLeftArrow={<CustomArrows direction="left" />}
-              customRightArrow={<CustomArrows direction="right" />}
+              customLeftArrow={<CustomArrow theme="dark" direction="left" />}
+              customRightArrow={<CustomArrow theme="dark" direction="right" />}
               customDot={<CustomDots />}
             >
-              {selectedFiles.map((file) => (
+              {selectedFiles.map((file, index) => (
                 <Image
                   src={URL.createObjectURL(file)}
                   layout="responsive"
@@ -172,6 +164,7 @@ export const ModalCreatePost: React.FC<Props> = () => {
                   objectPosition="center"
                   width={570}
                   height={570}
+                  key={index}
                 />
               ))}
             </Carousel>
@@ -206,7 +199,7 @@ export const ModalCreatePost: React.FC<Props> = () => {
                   <div className="relative min-w-[28px] w-7 h-7 rounded-full bg-gray-100 border border-gray-300 mr-3">
                     <Image src="/icons/user.svg" layout="fill" />
                   </div>
-                  <span className="font-[500]">taes00kang</span>
+                  <span className="font-[500]">{currentUser?.username}</span>
                 </div>
                 <textarea
                   value={caption}
@@ -214,7 +207,7 @@ export const ModalCreatePost: React.FC<Props> = () => {
                   cols={100}
                   onChange={handleCaptionChange}
                   placeholder="Write a caption..."
-                  className="w-full px-4 focus:outline-none resize-none placeholder:text-gray-500"
+                  className="w-full px-4"
                   maxLength={400}
                 />
               </div>
@@ -232,3 +225,4 @@ export const ModalCreatePost: React.FC<Props> = () => {
   );
 };
 
+export default ModalCreatePost;

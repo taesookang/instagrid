@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { InputField, SubmitButton, Seperator } from ".";
 import { AiFillFacebook } from "react-icons/ai";
 import { useRouter } from "next/router";
@@ -6,7 +6,8 @@ import { auth, db, signInWithFacebook } from "../../firebase";
 import {
   createUserWithEmailAndPassword,
   AuthErrorCodes,
-  onAuthStateChanged
+  onAuthStateChanged,
+  updateProfile
 } from "firebase/auth";
 import {
   collection,
@@ -17,7 +18,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import Image from "next/image";
-import { User } from "../../types";
+import { IUser } from "../../types";
 
 const SignUpForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -27,20 +28,22 @@ const SignUpForm: React.FC = () => {
 
   const router = useRouter();
 
-  onAuthStateChanged(auth, (user) => {
-    if(user) {
-      router.push("/")
-    }
-  })
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
+  }, [auth]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    signUp(email, password)
+    signUp(email, password);
   };
 
   const signUp = async (email: string, password: string) => {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, where("username", "==", username));
+    const q = query(usersRef, where("username", "==", username.toLowerCase()));
     const usersSnapshot = await getDocs(q);
 
     if (usersSnapshot.docs.length > 0) {
@@ -50,17 +53,22 @@ const SignUpForm: React.FC = () => {
       createUserWithEmailAndPassword(auth, email, password)
         .then(async (userCredencial) => {
           const user = userCredencial.user;
-          const modifiedUser: User = {
-            email: user.email,
+          updateProfile(auth.currentUser!, {
+            displayName:username.toLowerCase()
+          })
+
+          const modifiedUser: IUser = {
+            id: user.uid,
+            email: user.email!,
             excerpt: null,
-            username: username,
+            username: username.toLowerCase(),
             photoUrl: user.photoURL,
             followers: [],
             followings: [],
           };
 
           try {
-            await setDoc(doc(db, "users", user.uid), modifiedUser);
+            await setDoc(doc(db, "users", modifiedUser.id), modifiedUser);
           } catch (err) {
             console.error("Error adding document: ", err);
           }
@@ -89,7 +97,10 @@ const SignUpForm: React.FC = () => {
           <h1 className="text-lg w-[268px] text-center leading-5 font-[500] text-gray-400 mb-4">
             Sign up to see photos and videos from your friends.
           </h1>
-          <div onClick={signInWithFacebook} className="w-[278px] px-2 py-[5px] rounded-md flex items-center justify-center text-white bg-button-primary font-[500] cursor-pointer">
+          <div
+            onClick={signInWithFacebook}
+            className="w-[278px] px-2 py-[5px] rounded-md flex items-center justify-center text-white bg-button-primary font-[500] cursor-pointer"
+          >
             <AiFillFacebook className="mr-2 w-5 h-5" color="#ffffff" />
             <p>Log in with Facebook</p>
           </div>

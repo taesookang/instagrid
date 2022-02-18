@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, signInWithFacebook } from "../../firebase";
 import { InputField, SubmitButton, Seperator } from ".";
 import { AiFillFacebook } from "react-icons/ai";
 import { useRouter } from "next/router";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
+import nookies from 'nookies';
+
+
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -13,11 +16,13 @@ const LoginForm: React.FC = () => {
 
   const router = useRouter();
 
-  onAuthStateChanged(auth, (user) => {
-    if(user) {
-      router.push("/")
-    }
-  })
+  useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        router.push("/");
+      }
+    });
+  }, [auth]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

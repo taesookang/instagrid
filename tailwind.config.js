@@ -5,6 +5,15 @@ module.exports = {
   ],
   theme: {
     extend: {
+      minHeight : {
+        'section': 'calc(100vh - 60px)'
+      },
+      dropShadow: {
+        'menu': '0 0px 3px rgba(0, 0, 0, 0.2)',
+      },
+      fontSize: {
+        "2xs": "10px",
+      },
       colors: {
         button: {
           primary: "#0096F6",
@@ -14,19 +23,18 @@ module.exports = {
       },
       keyframes: {
         scaleDown: {
-          '0%': { transform: 'scale(1.5)' },
-          '100%': { transform: 'scale(1)' },
+          "0%": { transform: "scale(1.5)" },
+          "100%": { transform: "scale(1)" },
         },
         scaleUp: {
-          '0%': { transform: 'scale(0)'},
-          '100%': { transform: 'scale(1)' },
+          "0%": { transform: "scale(0)" },
+          "100%": { transform: "scale(1)" },
         },
-        
       },
       animation: {
-        scaleDown: 'scaleDown .1s ease-out',
-        scaleUp: 'scaleUp .5s ease-out',
-      }
+        scaleDown: "scaleDown .1s ease-out",
+        scaleUp: "scaleUp .5s ease-out",
+      },
     },
     linearBorderGradients: {
       directions: {
@@ -59,5 +67,8 @@ module.exports = {
       },
     }),
   },
-  plugins: [require("tailwindcss-border-gradients")()],
+  plugins: [
+    require("tailwindcss-border-gradients"),
+    require("@tailwindcss/line-clamp"),
+  ],
 };

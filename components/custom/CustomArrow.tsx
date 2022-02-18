@@ -3,16 +3,17 @@ import { ArrowProps } from "react-multi-carousel/lib/types";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 interface CustomArrowProps extends ArrowProps {
-  direction: "right" | "left";
+  direction: "right" | "left"
+  theme: "light" | "dark"
 }
 
-const CustomArrows: React.FC<CustomArrowProps> = ({ direction, onClick }) => {
+const CustomArrow: React.FC<CustomArrowProps> = ({ theme, direction, onClick }) => {
   return (
     <button
       onClick={onClick}
       className={`absolute ${
         direction === "right" ? "right-2" : "left-2"
-      } flex items-center justify-center bg-black/50 text-white w-8 h-8 rounded-full `}
+      } ${theme === "light" ? "bg-white/50 text-black" : "bg-black/50 text-white" } flex items-center justify-center  w-8 h-8 rounded-full shadow-md `}
     >
       {direction === "right" ? (
         <FiChevronRight className="w-5 h-5" />
@@ -23,4 +24,4 @@ const CustomArrows: React.FC<CustomArrowProps> = ({ direction, onClick }) => {
   );
 };
 
-export default CustomArrows;
+export default CustomArrow;

@@ -23,7 +23,7 @@ export const InputField: React.FC<Props> = ({
         type={showPassword ? "text" : type}
         className={`w-full h-[38px] border-box rounded-sm px-[8px] tracking-wide ${
           value.length > 0 && "text-xs pt-4"
-        }`}
+        } ${type !== "password" && "lowercase"}`}
         value={value}
         ref={inputRef}
         onChange={(e) => setValue(e.target.value)}
