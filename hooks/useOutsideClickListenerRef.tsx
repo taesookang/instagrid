@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react'
 
-export const useOutsideClickLisnterRef = (onClose: () => void) => {
+export const useOutsideClickListenerRef = (onClose: () => void) => {
   const ref = useRef(null)
   const escapeListener = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -9,7 +9,7 @@ export const useOutsideClickLisnterRef = (onClose: () => void) => {
   }, [])
   const clickListener = useCallback(
     (e: MouseEvent) => {
-      if (!(ref.current! as any).contains(e.target)) {
+      if (!(ref?.current! as any).contains(e.target)) {
         onClose?.()
       }
     },

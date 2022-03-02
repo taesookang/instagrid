@@ -59,9 +59,9 @@ const SignUpForm: React.FC = () => {
 
           const modifiedUser: IUser = {
             id: user.uid,
+            username: username.toLowerCase(),
             email: user.email!,
             excerpt: null,
-            username: username.toLowerCase(),
             photoUrl: user.photoURL,
             followers: [],
             followings: [],

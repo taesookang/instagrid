@@ -3,10 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { IoSearchOutline, IoCloseCircle } from "react-icons/io5";
 import { TailSpin } from "react-loader-spinner";
-import { useOutsideClickLisnterRef } from "../../hooks/useOutsideClickLisnterRef";
+import { useOutsideClickListenerRef } from "../../hooks/useOutsideClickListenerRef";
 import { useRouter } from "next/router";
 
 import { useAuth } from "../../context/AuthContext";
+import { useGlobalContext } from "../../context/GlobalContext";
 
 import { ModalCreatePost, ModalPost } from "../modals";
 
@@ -19,16 +20,17 @@ export const Header: React.FC = () => {
   const [inputIsFocused, setInputIsFocused] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [createPostModalOpen, setCreatePostModalOpen] = useState(false)
+
+  const { createPostModalOpen, setCreatePostModalOpen } = useGlobalContext()
 
   const router = useRouter();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const inputBoxRef = useOutsideClickLisnterRef(() => {
+  const inputBoxRef = useOutsideClickListenerRef(() => {
     setInputIsFocused(false);
   });
 
-  const userMenuRef = useOutsideClickLisnterRef(() => {
+  const userMenuRef = useOutsideClickListenerRef(() => {
     setMenuOpen(false)
   })
 
@@ -39,6 +41,9 @@ export const Header: React.FC = () => {
       router.push("/accounts/login");
     });
   };
+
+  console.log(currentUser);
+  
 
   return (
     currentUser &&

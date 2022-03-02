@@ -19,6 +19,7 @@
     "react-loader-spinner": "^5.1.0",
     "react-modal": "^3.14.4",
     "react-multi-carousel": "^2.6.5",
+    "react-responsive": "^9.0.0-beta.6",
     "sass": "^1.49.0",
     "tailwindcss-border-gradients": "^2.0.3",
     "uuid": "^8.3.2"

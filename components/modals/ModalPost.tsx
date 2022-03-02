@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import Image from "next/image";
+
+import { useRouter } from "next/router";
 import { IoClose } from "react-icons/io5";
 import Modal from "react-modal";
-import { HiOutlineDotsHorizontal } from "react-icons/hi";
-import { useOutsideClickLisnterRef } from "../../hooks/useOutsideClickLisnterRef";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../firebase";
-import { IPost } from "../../types/index";
+import { IPostWithUserPhoto } from "../../types/index";
+import { LikeButton, PostHeader } from "../post";
+import { CommentList, CommentForm } from "../comments";
+import { getPostById } from "../../firebase/service";
+import { useMediaQuery } from "react-responsive";
+import moment from "moment";
+
+import { ModalPostCarousel } from ".";
+
 interface Props {}
 
 export const ModalPost: React.FC<Props> = () => {
-  const [post, setPost] = useState<IPost | null>(null);
+  const [post, setPost] = useState<IPostWithUserPhoto | null>(null);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
 
   useEffect(() => {
     !!router.query.pid ? setIsOpen(true) : setIsOpen(false);
@@ -24,24 +30,13 @@ export const ModalPost: React.FC<Props> = () => {
 
   useEffect(() => {
     const getPost = async () => {
-      const postRef = doc(db, "posts", postId);
-      const postDoc = await getDoc(postRef);
-      const data = postDoc.data()
-      
-      setPost({
-        id: data?.id,
-        userId: data?.userId,
-        userPhotoUrl: data?.userPhotoUrl,
-        username: data?.username,
-        photos: data?.photos,
-        likes: data?.likes,
-        comments: data?.comments,
-        createdAt: data?.createdAt,
-        caption: data?.caption,
-      });
+      const fetchedPost = await getPostById(postId);
+
+      setPost(fetchedPost);
     };
+
     isOpen && getPost();
-  },[isOpen]);
+  }, [isOpen]);
 
   return (
     <Modal
@@ -53,7 +48,7 @@ export const ModalPost: React.FC<Props> = () => {
         });
       }}
       overlayClassName="modal-post__overlay"
-      className={`modal-post w-full aspect-[5/3] max-h-full max-w-[1240px] rounded-xl animate-scaleDown overflow-hidden transtion-all duration-300 ease-in-out`}
+      className={`modal-post w-full sm:aspect-[5/3] max-h-full min-h-[450px] max-w-[1240px] rounded-xl animate-scaleDown overflow-hidden transtion-all duration-300 ease-in-out flex flex-col sm:flex-row`}
     >
       <IoClose
         onClick={() => {
@@ -61,27 +56,54 @@ export const ModalPost: React.FC<Props> = () => {
         }}
         className="fixed top-4 right-4 text-white w-10 h-10 cursor-pointer"
       />
-      <div className="h-full w-full lg:w-auto lg:aspect-square flex items-center bg-black justify-center">
-        <div className="relative w-full max-h-full aspect-square">
-          <Image src={"/images/img1.png"} layout="fill" />
-        </div>
-      </div>
-      <div className="min-w-[404px] w-full h-full bg-white">
-        <div className="h-[60px] border-b border-[#bdbdbd] flex items-center justify-between px-4">
-          <div className="flex items-center">
-            <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-red-300 mr-2">
+      {post && !isMobile ? (
+        <ModalPostCarousel photos={post.photos} />
+      ) : (
+        <div className="h-full w-full flex items-center bg-gray-50" />
+      )}
+      <div className=" w-full h-full max-w-[500px] bg-white flex flex-col justify-between">
+        <PostHeader
+          userPhotoUrl={post?.userPhotoUrl!}
+          username={post?.username!}
+          postId={post?.id!}
+        />
+        {post && isMobile && <ModalPostCarousel photos={post.photos} />}
+        <div className="w-full h-full overflow-y-scroll hidden sm:flex p-4 flex-col">
+          <div className="flex min-h-[84px] w-full mt-4">
+            <div className="relative min-w-[32px] min-h-[32px] w-8 h-8 overflow-hidden rounded-full mr-4">
               <Image
-                src={`${post?.userPhotoUrl ? post.userPhotoUrl:"/icons/user.svg"}`}
-                width={32}
-                height={32}
-                className="rounded-full"
+                src={`${
+                  post?.userPhotoUrl
+                    ? post.userPhotoUrl
+                    : "/icons/user.svg"
+                }`}
+                layout="fill"
               />
             </div>
-            <span className="text-sm font-[500]">{post?.username}</span>
+            <div className="flex flex-col w-full max-h-36">
+              <p className="text-sm">
+                <span className="font-[500] hover:underline cursor-pointer">
+                  {post?.username}
+                </span>{" "}
+                {post?.caption}
+              </p>
+              <div className="mt-2 mb-1 flex items-center min-h-[24px]">
+                <span className="text-xs text-gray-400">
+                  {moment(post?.createdAt).fromNow(true)}
+                </span>
+              </div>
+            </div>
           </div>
-          <div>
-            <HiOutlineDotsHorizontal width={24} height={24} />
-          </div>
+          <CommentList postId={postId} type="modal" />
+        </div>
+        <div className="p-2">
+          <LikeButton postId={postId} />
+          <span className="uppercase text-[10px] text-gray-400 tracking-wider mx-2">
+            {moment(post?.createdAt).format("MMMM, DD, YYYY")}
+          </span>
+        </div>
+        <div className="w-full h-fit">
+          <CommentForm postId={postId} />
         </div>
       </div>
     </Modal>

@@ -1,6 +1,5 @@
 // General
 import React, { useState } from "react";
-import { useRouter } from "next/router";
 import Image from "next/image";
 import { IPost } from "../../types";
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
@@ -31,7 +30,6 @@ interface Props {
 
 
 export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
-  const router = useRouter();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadIsDone, setUploadIsDone] = useState(false);
   const [openCaptionInput, setOpenCaptionInput] = useState(false);
@@ -48,8 +46,6 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     setOpenCaptionInput(false);
     const newPost: IPost = {
       id: uuidv4(),
-      userId: currentUser?.id!,
-      userPhotoUrl: currentUser?.photoUrl!,
       username: currentUser?.username!,
       photos: [],
       likes: [],

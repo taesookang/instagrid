@@ -4,7 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Layout } from "../components/layout";
-import { PostCard, NoPosts } from "../components/home";
+import { PostCard, NoPosts } from "../components/post";
 import { auth, db } from "../firebase";
 import { IUser, IPost, ISuggestedUser } from "../types";
 import { onAuthStateChanged } from "firebase/auth";
@@ -31,16 +31,18 @@ import {
 import nookies from "nookies";
 
 import { verifyIdToken } from "../firebase/admin";
+import { getUserPhotoUrl, getPostsByUsername } from '../firebase/service';
+import { IPostWithUserPhoto } from "../types/index";
 
 export default function Home({
   posts,
   suggestions,
 }: {
-  posts: IPost[] | [];
+  posts: IPostWithUserPhoto[] | [];
   suggestions: ISuggestedUser[] | [];
 }) {
   const router = useRouter();
-  
+
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -150,7 +152,6 @@ Home.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const posts: IPost[] = [];
   const suggestions: ISuggestedUser[] = [];
   try {
     // parse & verify token cookie => get user id
@@ -165,29 +166,35 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       const userData = userDocSnap.data();
 
       // get posts
-      const postsRef = collection(db, "posts");
-      const postsQuery = query(
-        postsRef,
-        orderBy("createdAt", "desc"),
-        where("userId", "==", userData?.id)
-        // where("userId", "array-contains", userData?.followings)
-      );
-      const postsSnapshot = await getDocs(postsQuery);
-      postsSnapshot.forEach((doc) => {
-        const data = doc.data();
-        const post: IPost = {
-          id: data.id,
-          userId: data.userId,
-          userPhotoUrl: data.userPhotoUrl,
-          username: data.username,
-          photos: data.photos,
-          likes: data.likes,
-          comments: data.comments,
-          createdAt: data.createdAt,
-          caption: data.caption,
-        };
-        posts.push(post);
-      });
+
+      const posts = await getPostsByUsername(userData?.username)
+      // const posts: IPostWithUserPhoto[] = [];
+
+      // const postsRef = collection(db, "posts");
+      // const postsQuery = query(
+      //   postsRef,
+      //   orderBy("createdAt", "desc"),
+      //   where("username", "==", userData?.username)
+      //   // where("userId", "array-contains", userData?.followings)
+      // );
+      // const postsSnapshot = await getDocs(postsQuery);
+      // postsSnapshot.forEach(async (doc) => {
+      //   const postData = doc.data();
+
+      //   const userPhotoUrl = await getUserPhotoUrl(postData.username);
+
+      //   const post: IPostWithUserPhoto = {
+      //     id: postData.id,
+      //     photos: postData.photos,
+      //     likes: postData.likes,
+      //     comments: postData.comments,
+      //     createdAt: postData.createdAt,
+      //     caption: postData.caption,
+      //     userPhotoUrl: userPhotoUrl,
+      //     username: postData.username,
+      //   };
+      //   posts.push(post);
+      // });
 
       // get suggestions
 

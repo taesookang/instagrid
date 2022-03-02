@@ -51,7 +51,7 @@ textarea {
 
 span,
 p {
-  letter-spacing: 0.025em;
+  letter-spacing: 0.02em;
 }
 
 .modal-create {
@@ -91,7 +91,7 @@ p {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -102,5 +102,14 @@ p {
   border-left: 10px solid transparent;
   border-right: 10px solid transparent;
   border-bottom: 10px solid white;
-  
+}
+
+.comment {
+  &__menu {
+    display: none;
+  }
+  &:hover &__menu {
+    
+    display: block;
+  }
 }

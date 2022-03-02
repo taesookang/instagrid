@@ -9,21 +9,25 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { useAuth } from "../../context/AuthContext";
 
 import { db } from "../../firebase";
+import { getUserPhotoUrl, getUserByUsername } from "../../firebase/service";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { IPost, IUser } from "../../types/index";
+import { IPost, IPostWithUserPhoto, IUser } from "../../types/index";
 import { HeartIconFill, ChatIconFill } from "../../components/icons/fill";
 
 export const ProfilePage = ({
   posts,
   user,
 }: {
-  posts: IPost[];
+  posts: IPostWithUserPhoto[];
   user: IUser;
 }) => {
   const { currentUser } = useAuth();
-  const isOwner = user.id === currentUser?.id;
+  const isOwner = user.username === currentUser?.username;
 
   const router = useRouter();
+
+  console.log(posts);
+  
 
   return (
     <div className="w-full min-h-full">
@@ -162,24 +166,26 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({
   params,
 }: GetStaticPropsContext) => {
+
   // Get posts by username
-  const posts: IPost[] = [];
+  const posts: IPostWithUserPhoto[] = [];
   const postsRef = collection(db, "posts");
   const postsQuery = query(postsRef, where("username", "==", params?.username));
   const postsSnapshots = await getDocs(postsQuery);
 
-  postsSnapshots.forEach((doc) => {
+  postsSnapshots.forEach(async (doc) => {
     const data = doc.data();
-    const post: IPost = {
+    const userPhotoUrl = await getUserPhotoUrl(data.username)
+    
+    const post: IPostWithUserPhoto = {
       id: data.id,
-      userId: data.userId,
-      userPhotoUrl: data.userPhotoUrl,
-      username: data.username,
       photos: data.photos,
       likes: data.likes,
       comments: data.comments,
       createdAt: data.createdAt,
       caption: data.caption,
+      username: data.username,
+      userPhotoUrl: userPhotoUrl,
     };
 
     posts.push(post);
@@ -187,26 +193,27 @@ export const getStaticProps: GetStaticProps = async ({
 
   // Get user data by username
 
-  const userCache: IUser[] = [];
-  const usersRef = collection(db, "users");
-  const usersQuery = query(usersRef, where("username", "==", params?.username));
-  const userSnapshot = await getDocs(usersQuery);
+  const user: IUser = await getUserByUsername(params!.username as string)
 
-  userSnapshot.forEach((doc) => {
-    const data = doc.data();
+  // const userCache: IUser[] = [];
+  // const usersRef = collection(db, "users");
+  // const usersQuery = query(usersRef, where("username", "==", params?.username));
+  // const userSnapshot = await getDocs(usersQuery);
 
-    const user: IUser = {
-      id: data.id,
-      email: data.email,
-      username: data.username,
-      excerpt: data.excerpt,
-      photoUrl: data.photoUrl,
-      followers: data.followers,
-      followings: data.followings,
-    };
-    userCache.push(user);
-  });
-  const user = userCache[0];
+  // userSnapshot.forEach((doc) => {
+  //   const data = doc.data();
+
+    // const user: IUser = {
+    //   email: userData?.email,
+    //   username: userData?.username,
+    //   excerpt: userData?.excerpt,
+    //   photoUrl: userData?.photoUrl,
+    //   followers: userData?.followers,
+    //   followings: userData?.followings,
+    // };
+  //   userCache.push(user);
+  // });
+  // const user = userCache[0];
 
   return { props: { posts, user } };
 };

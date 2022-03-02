@@ -30,10 +30,17 @@ module.exports = {
           "0%": { transform: "scale(0)" },
           "100%": { transform: "scale(1)" },
         },
+        scaleUpToDown: {
+          "0%": {transform: "scale(1)" },
+          "33%": {transform: "scale(1.2)" },
+          "66%": {transform: "scale(0.8)" },
+          "100%": {transform: "scale(1)" },
+        },
       },
       animation: {
         scaleDown: "scaleDown .1s ease-out",
         scaleUp: "scaleUp .5s ease-out",
+        scaleUpToDown: "scaleUpToDown .4s ease-out"
       },
     },
     linearBorderGradients: {

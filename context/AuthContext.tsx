@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 
 import { auth, db } from "../firebase";
 import { onIdTokenChanged } from "firebase/auth";
-import { doc, getDoc, DocumentData } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { IUser } from "../types";
 
 import nookies from "nookies";
@@ -27,7 +27,7 @@ export const AuthContextProvider: React.FC = ({ children }) => {
         nookies.set({}, "token", token, {
           path: "/",
         });
-        const userDocRef = doc(db, "users", user.uid);
+        const userDocRef = doc(db, "users", user.uid!);
         const userDocSnap = await getDoc(userDocRef);
 
         const userData = userDocSnap.data();

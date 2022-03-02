@@ -1,2 +1,5 @@
 export { default as ModalCreatePost } from "./ModalCreatePost"
 export { default as ModalPost } from "./ModalPost"
+export { default as ModalPostCarousel } from "./ModalPostCarousel"
+export { default as OptionsModal } from "./OptionsModal"
+export { default as OptionButton } from "./OptionButton"
