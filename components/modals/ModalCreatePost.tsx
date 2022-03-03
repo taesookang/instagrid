@@ -46,7 +46,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     setOpenCaptionInput(false);
     const newPost: IPost = {
       id: uuidv4(),
-      username: currentUser?.username!,
+      userId: currentUser?.id!,
       photos: [],
       likes: [],
       comments: [],

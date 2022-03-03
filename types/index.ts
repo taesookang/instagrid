@@ -20,6 +20,7 @@ export interface ISuggestedUser {
 export interface IComment {
     id: string
     postId: IPost["id"]
+    userId: IUser["id"]
     username: IUser["username"]
     userPhotoUrl: IUser["photoUrl"]
     value: string
@@ -34,11 +35,12 @@ export interface IPost {
     comments: IComment["id"][] | []
     createdAt: number
     caption: string | null
-    username: IUser["username"]
+    userId: IUser["id"]
 }
 
-export interface IPostWithUserPhoto extends IPost {
-    userPhotoUrl: string | null
+export interface IPostWithUserData extends IPost {
+    username: IUser["username"]
+    userPhotoUrl: IUser["photoUrl"]
 }
 
 

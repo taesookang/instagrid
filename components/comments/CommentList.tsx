@@ -64,7 +64,7 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
   }, []);
 
   const deleteClickHandle = async () => {
-    await deleteComment(selectedComment!, postId).then(() => {
+    await deleteComment(selectedComment!, postId).then(async () => {
       setComments((prev) => prev.filter((x) => x.id !== selectedComment));
       setModalOpen(false);
     });
@@ -96,6 +96,7 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
       {/* */}
       {comments.map((comment: IComment) => (
         <Comment
+        key={comment.id}
           comment={comment}
           modalOpen={modalOpen}
           setModalOpen={setModalOpen}

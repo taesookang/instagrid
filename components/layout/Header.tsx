@@ -41,8 +41,6 @@ export const Header: React.FC = () => {
       router.push("/accounts/login");
     });
   };
-
-  console.log(currentUser);
   
 
   return (

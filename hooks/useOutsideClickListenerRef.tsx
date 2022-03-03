@@ -9,7 +9,7 @@ export const useOutsideClickListenerRef = (onClose: () => void) => {
   }, [])
   const clickListener = useCallback(
     (e: MouseEvent) => {
-      if (!(ref?.current! as any).contains(e.target)) {
+      if (ref?.current !== null && !(ref?.current! as any).contains(e.target)) {
         onClose?.()
       }
     },

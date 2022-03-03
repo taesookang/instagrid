@@ -1,4 +1,4 @@
-import React, { ReactElement } from "react";
+import React, { ReactElement, useState } from "react";
 import { Layout } from "../../components/layout";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,26 +8,33 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 
 import { useAuth } from "../../context/AuthContext";
 
-import { db } from "../../firebase";
-import { getUserPhotoUrl, getUserByUsername } from "../../firebase/service";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { IPost, IPostWithUserPhoto, IUser } from "../../types/index";
+import { db, auth } from "../../firebase";
+import { getUserByUsername, getPostsByUsername } from '../../firebase/service';
+import { collection, getDocs } from 'firebase/firestore';
+import { signOut } from "firebase/auth";
+import { IPostWithUserData, IUser } from "../../types/index";
 import { HeartIconFill, ChatIconFill } from "../../components/icons/fill";
+import { OptionButton, OptionsModal } from "../../components/modals";
 
 export const ProfilePage = ({
-  posts,
+  posts, 
   user,
 }: {
-  posts: IPostWithUserPhoto[];
+  posts: IPostWithUserData[];
   user: IUser;
 }) => {
+  const [optionModalOpen, setOptionModalOpen] = useState(false)
   const { currentUser } = useAuth();
   const isOwner = user.username === currentUser?.username;
 
   const router = useRouter();
 
-  console.log(posts);
-  
+  const logout = async () => {
+    signOut(auth).then(() => {
+      router.push("/accounts/login");
+    });
+  };
+
 
   return (
     <div className="w-full min-h-full">
@@ -46,12 +53,25 @@ export const ProfilePage = ({
               <span className=" text-[28px] font-[300] tracking-normal">
                 {user.username}
               </span>
-              <button className=" ml-5 text-sm font-[500] px-[9px] py-[5px] border border-gray-300 rounded-md">
+             { isOwner &&
+             <>
+             <button className=" ml-5 text-sm font-[500] px-[9px] py-[5px] border border-gray-300 rounded-md active:text-gray-500"
+              onClick={() => router.push("/accounts/edit")}              
+              >
                 Edit Profile
               </button>
-              <button className="ml-[5px] w-10 h-10 p-2">
+              <button className="ml-[5px] w-10 h-10 p-2"
+                onClick={() => setOptionModalOpen(true)}
+              >
                 <Image src="/icons/setting.svg" width={24} height={24} />
               </button>
+              <OptionsModal isOpen={optionModalOpen} setIsOpen={setOptionModalOpen}>
+                <OptionButton title={"Change Password"} onClick={() => router.replace({ pathname: "/accounts/edit/", query:{ password: "change"} }, "/accounts/password/change")}/>
+                <OptionButton title={"Log Out"} onClick={logout}/>
+                <OptionButton title={"Cancel"} onClick={() => setOptionModalOpen(false)}/>
+              </OptionsModal>
+              </>
+              }
             </div>
             <div className="h-6 flex items-center text-[16px] tracking-normal mb-5">
               <p className="mr-10">
@@ -145,9 +165,7 @@ export const ProfilePage = ({
 export const getStaticPaths: GetStaticPaths = async () => {
   const usernames: string[] = [];
   const usersCollection = collection(db, "users");
-  // const postsCollection = collection(db, "posts")
   const userSnapshot = await getDocs(usersCollection);
-  // const postSnapshot = await getDocs(postsCollection);
 
   userSnapshot.forEach((doc) => {
     usernames.push(doc.data().username);
@@ -166,54 +184,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps = async ({
   params,
 }: GetStaticPropsContext) => {
-
   // Get posts by username
-  const posts: IPostWithUserPhoto[] = [];
-  const postsRef = collection(db, "posts");
-  const postsQuery = query(postsRef, where("username", "==", params?.username));
-  const postsSnapshots = await getDocs(postsQuery);
-
-  postsSnapshots.forEach(async (doc) => {
-    const data = doc.data();
-    const userPhotoUrl = await getUserPhotoUrl(data.username)
-    
-    const post: IPostWithUserPhoto = {
-      id: data.id,
-      photos: data.photos,
-      likes: data.likes,
-      comments: data.comments,
-      createdAt: data.createdAt,
-      caption: data.caption,
-      username: data.username,
-      userPhotoUrl: userPhotoUrl,
-    };
-
-    posts.push(post);
-  });
-
-  // Get user data by username
-
+  const posts = await getPostsByUsername(params!.username as string)
+  // Get user by username
   const user: IUser = await getUserByUsername(params!.username as string)
-
-  // const userCache: IUser[] = [];
-  // const usersRef = collection(db, "users");
-  // const usersQuery = query(usersRef, where("username", "==", params?.username));
-  // const userSnapshot = await getDocs(usersQuery);
-
-  // userSnapshot.forEach((doc) => {
-  //   const data = doc.data();
-
-    // const user: IUser = {
-    //   email: userData?.email,
-    //   username: userData?.username,
-    //   excerpt: userData?.excerpt,
-    //   photoUrl: userData?.photoUrl,
-    //   followers: userData?.followers,
-    //   followings: userData?.followings,
-    // };
-  //   userCache.push(user);
-  // });
-  // const user = userCache[0];
 
   return { props: { posts, user } };
 };

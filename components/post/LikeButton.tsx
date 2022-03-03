@@ -68,7 +68,7 @@ export const LikeButton: React.FC<Props> = ({ postId }) => {
             height={24}
           />
         ) : (
-          <HeartIconOutlined color="#262626" width={24} height={24} />
+          <HeartIconOutlined className="hover:opacity-50" color="#262626" width={24} height={24} />
         )}
       </div>
       <div className="w-full flex items-center text-sm font-[500] mb-2 px-2">

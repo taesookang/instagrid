@@ -31,14 +31,14 @@ import {
 import nookies from "nookies";
 
 import { verifyIdToken } from "../firebase/admin";
-import { getUserPhotoUrl, getPostsByUsername } from '../firebase/service';
-import { IPostWithUserPhoto } from "../types/index";
+import { getPostsByUsername, getPostsByUserId } from '../firebase/service';
+import { IPostWithUserData } from "../types/index";
 
 export default function Home({
   posts,
   suggestions,
 }: {
-  posts: IPostWithUserPhoto[] | [];
+  posts: IPostWithUserData[] | [];
   suggestions: ISuggestedUser[] | [];
 }) {
   const router = useRouter();
@@ -167,7 +167,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
       // get posts
 
-      const posts = await getPostsByUsername(userData?.username)
+      const posts = await getPostsByUserId(userData?.id)
       // const posts: IPostWithUserPhoto[] = [];
 
       // const postsRef = collection(db, "posts");
