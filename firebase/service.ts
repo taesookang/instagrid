@@ -11,26 +11,21 @@ import {
   QueryDocumentSnapshot,
   updateDoc,
   arrayRemove,
+  arrayUnion
 } from "firebase/firestore";
-import { db } from "./";
-import { IPostWithUserData, IUser } from "../types";
+import { db, storage } from "./";
+import { IPostWithUserData, IUser, IPhoto } from "../types";
+import { ref, deleteObject } from "firebase/storage";
+import { IPost } from '../types/index';
+
 
 const postsRef = collection(db, "posts");
 
 export const getPostUserData = async (id: string) => {
-  //   let userPhotoUrl = null;
-  //   const userDoc = doc(db, "users", );
-  //   const userSnapshot = await getDoc(userDoc);
-  //   const data = userSnapshot.data();
-  //   if (userSnapshot.exists()) {
-  //     userPhotoUrl = data?.photoUrl!;
-  //   }
   const user = await getUserById(id);
 
   const username = user?.username
   const photoUrl = user?.photoUrl
-
-  
 
   return { username, photoUrl };
 };
@@ -104,21 +99,6 @@ export const getPostsByUsername = async (username: string) => {
   });
 
   return posts;
-//   const posts: IPostWithUserData[] = [];
-//   const q = query(
-//     postsRef,
-//     where("username", "==", username),
-//     orderBy("createdAt", "desc")
-//   );
-
-//   const postsSnapshot = await getDocs(q);
-
-//   postsSnapshot.forEach(async (doc) => {
-//     const post = await getPostDataFromDoc(doc);
-//     posts.push(post);
-//   });
-
-//   return posts;
 };
 
 export const getPostsByUserId = async (id: string) => {
@@ -160,5 +140,39 @@ export const deleteComment = async (commentId: string, postId: string) => {
 
 export const deletePost = async (postId: string) => {
   const postDoc = doc(db, "posts", postId);
+  const post = await getDoc(postDoc)
+  const photos = post.data()?.photos
+
+  photos.forEach((photo: IPhoto )=> {
+      const imagesRef = ref(storage, `images/${photo.name}`)
+      deleteObject(imagesRef)
+  });
+
   await deleteDoc(postDoc);
 };
+
+export const UnfollowUser = async (profileUserid: string, currentUserId: string) => {
+    const currentUserDoc = doc(db, "users", currentUserId)
+    const profileUserDoc = doc(db, "users", profileUserid)
+
+    updateDoc(currentUserDoc, {
+        followings: arrayRemove(profileUserid)
+    }).then(async () => {
+        updateDoc(profileUserDoc, {
+            followers: arrayRemove(currentUserId)
+        })
+    })
+}
+
+export const followUser = async (profileUserid: string, currentUserId: string) => {
+  const currentUserDoc = doc(db, "users", currentUserId)
+    const profileUserDoc = doc(db, "users", profileUserid)
+
+    updateDoc(currentUserDoc, {
+        followings: arrayUnion(profileUserid)
+    }).then(async () => {
+        updateDoc(profileUserDoc, {
+            followers: arrayUnion(currentUserId)
+        })
+    })
+}

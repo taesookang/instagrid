@@ -5,8 +5,8 @@ export interface IUser {
     email: string
     excerpt: string | null
     photoUrl: string | null
-    followers: IUser[] | []
-    followings: IUser[] | []
+    followers: IUser["id"][] | []
+    followings: IUser["id"][] | []
 }
 
 export interface ISuggestedUser {
@@ -27,10 +27,14 @@ export interface IComment {
     createdAt: number
 }
 
+export interface IPhoto {
+    name: string
+    url: string
+}
 
 export interface IPost {
     id: string
-    photos: string[] 
+    photos: IPhoto[]
     likes: IUser[] | []
     comments: IComment["id"][] | []
     createdAt: number
@@ -42,6 +46,7 @@ export interface IPostWithUserData extends IPost {
     username: IUser["username"]
     userPhotoUrl: IUser["photoUrl"]
 }
+
 
 
 

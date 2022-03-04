@@ -10,10 +10,10 @@ import Carousel from "react-multi-carousel";
 import moment from "moment";
 
 // types
-import { IPostWithUserPhoto } from "../../types";
+import { IPostWithUserData } from "../../types";
 
 interface Props {
-  post: IPostWithUserPhoto;
+  post: IPostWithUserData;
 }
 
 export const PostCard: React.FC<Props> = ({ post }) => {
@@ -41,16 +41,16 @@ export const PostCard: React.FC<Props> = ({ post }) => {
         customRightArrow={<CustomArrow theme="light" direction="right" />}
         customDot={<CustomDots outside={true} />}
       >
-        {post.photos.map((photoUrl) => (
+        {post.photos.map((photo) => (
           <Image
-            src={photoUrl}
+            src={photo.url}
             priority
             layout="responsive"
             objectFit="cover"
             objectPosition="center"
             width={612}
             height={612}
-            key={photoUrl}
+            key={photo.name}
           />
         ))}
       </Carousel>

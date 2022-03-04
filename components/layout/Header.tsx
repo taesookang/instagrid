@@ -94,7 +94,7 @@ export const Header: React.FC = () => {
               <a className="relative w-6 h-6">
                 <Image
                   src={`/icons/home_${
-                    router.pathname === "/"
+                    router.pathname === "/" && !createPostModalOpen
                       ? "fill"
                       : "outline"
                   }.svg`}

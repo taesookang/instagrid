@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { IoClose } from "react-icons/io5";
 import Modal from "react-modal";
-import { IPostWithUserPhoto } from "../../types/index";
+import { IPostWithUserData } from "../../types/index";
 import { LikeButton, PostHeader } from "../post";
 import { CommentList, CommentForm } from "../comments";
 import { getPostById } from "../../firebase/service";
@@ -16,7 +16,7 @@ import { ModalPostCarousel } from ".";
 interface Props {}
 
 export const ModalPost: React.FC<Props> = () => {
-  const [post, setPost] = useState<IPostWithUserPhoto | null>(null);
+  const [post, setPost] = useState<IPostWithUserData | null>(null);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });

@@ -1,7 +1,7 @@
 // General
 import React, { useState } from "react";
 import Image from "next/image";
-import { IPost } from "../../types";
+import { IPhoto, IPost } from "../../types";
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
 // Icons
 import { IoClose } from "react-icons/io5";
@@ -62,7 +62,11 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
         .then((snapshot) => {
           getDownloadURL(snapshot.ref)
             .then((url) => {
-              newPost.photos.push(url);
+              const photo:IPhoto = {
+                name: imageId,
+                url: url
+              }
+              newPost.photos.push(photo);
             })
             .then(async () => {
               await setDoc(postDoc, newPost);

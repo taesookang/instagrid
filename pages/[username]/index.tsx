@@ -9,22 +9,25 @@ import { GetStaticPaths, GetStaticProps, GetStaticPropsContext } from "next";
 import { useAuth } from "../../context/AuthContext";
 
 import { db, auth } from "../../firebase";
-import { getUserByUsername, getPostsByUsername } from '../../firebase/service';
-import { collection, getDocs } from 'firebase/firestore';
+import { getUserByUsername, getPostsByUsername } from "../../firebase/service";
+import { collection, getDocs } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { IPostWithUserData, IUser } from "../../types/index";
 import { HeartIconFill, ChatIconFill } from "../../components/icons/fill";
 import { OptionButton, OptionsModal } from "../../components/modals";
+import { FollowButton } from "../../components/buttons";
 
 export const ProfilePage = ({
-  posts, 
+  posts,
   user,
 }: {
   posts: IPostWithUserData[];
   user: IUser;
 }) => {
-  const [optionModalOpen, setOptionModalOpen] = useState(false)
   const { currentUser } = useAuth();
+  // const followings = currentUser?.followings! as string[]
+  const [optionModalOpen, setOptionModalOpen] = useState(false);
+  // const [isFollowing, setIsFollowing] = useState(followings?.includes(user.id))
   const isOwner = user.username === currentUser?.username;
 
   const router = useRouter();
@@ -34,7 +37,6 @@ export const ProfilePage = ({
       router.push("/accounts/login");
     });
   };
-
 
   return (
     <div className="w-full min-h-full">
@@ -50,28 +52,49 @@ export const ProfilePage = ({
           </div>
           <div className="w-2/3 h-full flex flex-col">
             <div className="h-10 flex items-center mb-5">
-              <span className=" text-[28px] font-[300] tracking-normal">
+              <span className=" text-[28px] font-[300] tracking-normal mr-5">
                 {user.username}
               </span>
-             { isOwner &&
-             <>
-             <button className=" ml-5 text-sm font-[500] px-[9px] py-[5px] border border-gray-300 rounded-md active:text-gray-500"
-              onClick={() => router.push("/accounts/edit")}              
-              >
-                Edit Profile
-              </button>
-              <button className="ml-[5px] w-10 h-10 p-2"
-                onClick={() => setOptionModalOpen(true)}
-              >
-                <Image src="/icons/setting.svg" width={24} height={24} />
-              </button>
-              <OptionsModal isOpen={optionModalOpen} setIsOpen={setOptionModalOpen}>
-                <OptionButton title={"Change Password"} onClick={() => router.replace({ pathname: "/accounts/edit/", query:{ password: "change"} }, "/accounts/password/change")}/>
-                <OptionButton title={"Log Out"} onClick={logout}/>
-                <OptionButton title={"Cancel"} onClick={() => setOptionModalOpen(false)}/>
-              </OptionsModal>
-              </>
-              }
+              {currentUser && isOwner ? (
+                <>
+                  <button
+                    className=" text-sm font-[500] px-[9px] py-[5px] border border-gray-300 rounded-md active:text-gray-500"
+                    onClick={() => router.push("/accounts/edit")}
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    className="ml-[5px] w-10 h-10 p-2"
+                    onClick={() => setOptionModalOpen(true)}
+                  >
+                    <Image src="/icons/setting.svg" width={24} height={24} />
+                  </button>
+                  <OptionsModal
+                    isOpen={optionModalOpen}
+                    setIsOpen={setOptionModalOpen}
+                  >
+                    <OptionButton
+                      title={"Change Password"}
+                      onClick={() =>
+                        router.replace(
+                          {
+                            pathname: "/accounts/edit/",
+                            query: { password: "change" },
+                          },
+                          "/accounts/password/change"
+                        )
+                      }
+                    />
+                    <OptionButton title={"Log Out"} onClick={logout} />
+                    <OptionButton
+                      title={"Cancel"}
+                      onClick={() => setOptionModalOpen(false)}
+                    />
+                  </OptionsModal>
+                </>
+              ) : currentUser && (
+                <FollowButton user={user} />
+              )}
             </div>
             <div className="h-6 flex items-center text-[16px] tracking-normal mb-5">
               <p className="mr-10">
@@ -111,7 +134,7 @@ export const ProfilePage = ({
         <div className="w-full h-full grid gap-[3px] sm:gap-7 grid-cols-3">
           {posts.map((post) => (
             <Link
-              href={{pathname: router.asPath , query: {pid:post.id}}}
+              href={{ pathname: router.asPath, query: { pid: post.id } }}
               shallow
               key={post.id}
             >
@@ -143,7 +166,7 @@ export const ProfilePage = ({
                   </div>
                 </div>
                 <Image
-                  src={post.photos[0]}
+                  src={post.photos[0].url}
                   layout="fill"
                   objectFit="cover"
                   objectPosition="center"
@@ -185,9 +208,9 @@ export const getStaticProps: GetStaticProps = async ({
   params,
 }: GetStaticPropsContext) => {
   // Get posts by username
-  const posts = await getPostsByUsername(params!.username as string)
+  const posts = await getPostsByUsername(params!.username as string);
   // Get user by username
-  const user: IUser = await getUserByUsername(params!.username as string)
+  const user: IUser = await getUserByUsername(params!.username as string);
 
   return { props: { posts, user } };
 };

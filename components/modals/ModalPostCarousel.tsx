@@ -4,9 +4,10 @@ import Image from "next/image";
 
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
 import Carousel from "react-multi-carousel";
+import { IPhoto } from '../../types';
 
 interface Props {
-    photos: string[]
+    photos: IPhoto[]
 }
 
 export const ModalPostCarousel: React.FC<Props> = ({ photos }) => {
@@ -25,13 +26,13 @@ export const ModalPostCarousel: React.FC<Props> = ({ photos }) => {
         customRightArrow={<CustomArrow theme="light" direction="right" />}
         customDot={<CustomDots outside={true} />}
       >
-        {photos.map((photoUrl) => (
+        {photos.map((photo) => (
           <Image
-            src={photoUrl}
+            src={photo.url}
             priority
             layout="fill"
             objectPosition="center"
-            key={photoUrl}
+            key={photo.name}
           />
         ))}
       </Carousel>

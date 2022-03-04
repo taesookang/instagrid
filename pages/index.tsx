@@ -92,8 +92,8 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="mt-2 w-full flex items-center justify-between">
-                <p className="capitalize text-gray-400 font-semibold tracking-wide text-sm">
+              <div className="mt-2 w-full flex items-center justify-between" >
+                <p className="capitalize text-gray-400 font-semibold tracking-wide text-sm" >
                   Suggestions for you
                 </p>
                 <span className="capitalize text-xs font-[500] cursor-pointer">
@@ -104,7 +104,7 @@ export default function Home({
               <div className="flex flex-col py-2">
                 {suggestions?.map((suggestedUser) => (
                   <div className="flex items-center justify-between w-full h-12 py-2 px-4">
-                    <div className="relative min-w-[32px] w-8 h-8 rounded-full overflow-hidden mr-3 bg-gray-100 border border-gray-200">
+                    <div className="relative min-w-[32px] w-8 h-8 rounded-full overflow-hidden mr-3 bg-gray-100 border border-gray-200" >
                       <Image
                         src={
                           suggestedUser.photoUrl
