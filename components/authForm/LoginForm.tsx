@@ -5,9 +5,6 @@ import { AiFillFacebook } from "react-icons/ai";
 import { useRouter } from "next/router";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import Image from "next/image";
-import nookies from 'nookies';
-
-
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");

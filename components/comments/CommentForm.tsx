@@ -1,8 +1,8 @@
 import React,{ useState, useRef } from 'react'
+import Image from 'next/image'
 import { useAuth } from "../../context/AuthContext";
 import { v4 as uuidv4 } from "uuid";
 import { IComment } from "../../types";
-import Image from 'next/image'
 
 // firebase
 import { db } from "../../firebase";
@@ -11,10 +11,7 @@ import {
   setDoc,
   doc,
   arrayUnion,
-
 } from "firebase/firestore";
-
-
 
 interface Props {
     postId: string

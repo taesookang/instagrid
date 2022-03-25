@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 import { useRouter } from 'next/router'
 import { IUserEssentials } from "../../types";
-import { doc, arrayUnion, updateDoc } from "firebase/firestore";
-// import FollowButton from "../buttons/FollowButton";
 import { FollowButton } from '.'
 
 interface Props {

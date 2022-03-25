@@ -3,14 +3,16 @@ import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useAuth } from "../../../context/AuthContext";
+// components
 import { Layout } from "../../../components/layout";
-import { InputField } from "../../../components/authForm";
 import EditForm from "../../../components/edit/EditForm";
 import ChangePassword from "../../../components/edit/ChangePassword";
-import { IUser } from "../../../types";
+// firebase
 import { updatePhotoUrl } from "../../../firebase/service";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../../firebase";
+// types & dependencies
+import { IUser } from "../../../types";
 import { TailSpin } from "react-loader-spinner";
 
 const EditPage = () => {

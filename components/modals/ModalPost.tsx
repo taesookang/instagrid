@@ -1,18 +1,23 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-
-import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
+
+// dependencies
 import { IoClose } from "react-icons/io5";
 import Modal from "react-modal";
-import { IPostWithUserData } from "../../types/index";
-import { PostHeader } from "../post";
-import { LikeButton } from "../buttons";
-import { CommentList, CommentForm } from "../comments";
-import { getPostById } from "../../firebase/service";
 import { useMediaQuery } from "react-responsive";
 import moment from "moment";
 
+// types
+import { IPostWithUserData } from "../../types";
+
+// firebase
+import { getPostById } from "../../firebase/service";
+
+// components
+import { PostHeader } from "../post";
+import { LikeButton } from "../buttons";
+import { CommentList, CommentForm } from "../comments";
 import { ModalPostCarousel } from ".";
 
 interface Props {}

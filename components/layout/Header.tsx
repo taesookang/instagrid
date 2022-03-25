@@ -65,7 +65,7 @@ export const Header: React.FC = () => {
         <div className="container max-w-5xl h-full flex items-center justify-between">
           <Link href="/">
             <a className="relative w-36 h-10">
-              <Image src="/logo.svg" layout="fill" />
+              <Image src="/logo.svg" layout="fill" priority />
             </a>
           </Link>
 

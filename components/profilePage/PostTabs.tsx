@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { useMediaQuery } from "react-responsive";
 import { GridTabIcon, SaveTabIcon } from "../icons/outlined";
 
@@ -44,7 +43,6 @@ export const PostTabs: React.FC<Props> = ({
           }`}
           onClick={() => setPostsType("saved")}
         >
-          {/* <Image src="/icons/bookmark.svg" width={12} height={12} /> */}
           <SaveTabIcon size={isMobile ? 18 : 14} color={`${postsType ==="saved" ? isMobile ? "#0096F6" : "#262626" : "rgb(156 163 175)"}`} />
           {!isMobile && <span className="uppercase text-xs ml-[6px] font-[600] tracking-[1px]">
             Saved

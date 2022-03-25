@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import { useAuth } from '../../context/AuthContext'
+
+// components
 import { PostHeader } from ".";
 import { LikeButton, SaveButton } from "../buttons";
 import { CommentList, CommentForm } from "../comments";
 
+// custom
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
 
 // dependencies

@@ -12,7 +12,6 @@ import {
   updateDoc,
   arrayRemove,
   arrayUnion,
-  limit,
 } from "firebase/firestore";
 import { db, storage, auth } from "./";
 import {
@@ -27,13 +26,11 @@ import {
   deleteObject,
   uploadBytes,
   getDownloadURL,
-  getBytes,
   listAll,
-  list,
 } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
-import { IPost, Follower } from "../types/index";
-import { v4 as uuidv4 } from "uuid";
+import { Follower } from "../types/index";
+
 
 const postsRef = collection(db, "posts");
 const usersRef = collection(db, "users");
@@ -284,9 +281,6 @@ export const getUsersBySearch = async (term: string) => {
     usersRef,
     where("username", ">=", term),
     where("username", "<=", term + "\uf7ff")
-    // orderBy("username"),
-    // startAt(term),
-    // endAt(term +"\uf8ff" )
   );
 
   const querySnapshot = await getDocs(q);
@@ -311,10 +305,8 @@ export const getSuggestionsById = async (id: string) => {
 
   const userDoc = doc(db, "users", id)
   const userSnapshot = await getDoc(userDoc)
-
   const user = getUserDataFromDoc(userSnapshot)
-  // const followingUsers = user.followings.map((x) => x.id)
-
+  
   const usersQuery = query(usersRef, where("id", "!=", id));
   const querySnapshot = await getDocs(usersQuery);
   querySnapshot.forEach((doc) => {

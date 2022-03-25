@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
 
 import { useAuth } from "../../context/AuthContext";
-import { useRouter } from "next/router";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { OptionButton, OptionsModal } from "../modals";
 import { deletePost, UnfollowUser } from "../../firebase/service";

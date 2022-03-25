@@ -15,9 +15,9 @@ import Modal from "react-modal";
 import Dropzone from "react-dropzone";
 import { v4 as uuidv4 } from "uuid";
 // Firebase
-import { storage, db, auth } from "../../firebase";
+import { storage, db } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 
 // Auth
 import { useAuth } from "../../context/AuthContext";

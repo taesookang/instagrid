@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { IPostWithUserData } from "../../types/index";
 import { HeartIconFill, ChatIconFill } from "../../components/icons/fill";
-import { collection, where, query, onSnapshot, doc } from "firebase/firestore";
+import { onSnapshot, doc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { getPostDataFromDoc } from "../../firebase/service";
 

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useRouter } from "next/router";
+// types & context
 import { IUser } from "../../types";
 import { useAuth } from "../../context/AuthContext";
-import { useRouter } from "next/router";
+// components
 import { OptionButton, OptionsModal } from "../../components/modals";
 import { FollowButton } from "../../components/buttons";
+import { EditProfileButton, ProfileDashboard } from ".";
+// firebase
 import { auth } from "../../firebase";
 import { signOut } from "firebase/auth";
-import { getPostsByUserId, getPostsLengthById } from "../../firebase/service";
+import { getPostsLengthById } from "../../firebase/service";
+// dependencies
 import { useMediaQuery } from "react-responsive";
 
-import { EditProfileButton, ProfileDashboard } from ".";
 
 interface Props {
   user: IUser;

@@ -1,12 +1,10 @@
 import React, {  useState, useEffect } from "react";
-
 import Link from "next/link";
 import Image from "next/image";
-import { IPostWithUserData, IUser } from "../../types/index";
 import { useRouter } from "next/router";
+
+import { IPostWithUserData } from "../../types";
 import {  getPostsByUsername } from "../../firebase/service";
-
-
 import { HeartIconFill, ChatIconFill } from "../../components/icons/fill";
 
 

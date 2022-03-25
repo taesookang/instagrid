@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "./Header";
-import { ModalCreatePost, ModalPost } from "../modals";
+import { ModalPost } from "../modals";
 
 export const Layout: React.FC = ({ children }) => {
   return (
