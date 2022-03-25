@@ -12,10 +12,7 @@ interface Props {
 
 
 export const HeaderMenu: React.FC<Props> = ({ menuOpen, setMenuOpen, logout }) => {
-
     const { currentUser } = useAuth()
-
-
     const menu = [
         {
           title: "Profile",

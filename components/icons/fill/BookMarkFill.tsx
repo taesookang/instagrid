@@ -3,11 +3,11 @@ import React from "react";
 interface Props {
   className?: string;
   color: string;
-  size: number;
+  size: number
   fill?: boolean;
 }
 
-export const UserIcon: React.FC<Props> = ({
+export const BookMarkFill: React.FC<Props> = ({
   className,
   color,
   size
@@ -21,14 +21,15 @@ export const UserIcon: React.FC<Props> = ({
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <circle cx="25" cy="18" r="9" fill={color} />
         <path
-          d="M11 41.0769C11 34.9593 15.9593 30 22.0769 30H27.9231C34.0407 30 39 34.9593 39 41.0769V41.0769C39 41.5867 38.5867 42 38.0769 42H11.9231C11.4133 42 11 41.5867 11 41.0769V41.0769Z"
+          d="M5 4H45V46.0473L26.777 32.6502C25.7198 31.8729 24.2802 31.8729 23.223 32.6502L5 46.0473L5 4Z"
           fill={color}
+          stroke={color}
+          strokeWidth="4"
         />
       </svg>
     </div>
   );
 };
 
-export default UserIcon;
+export default BookMarkFill;

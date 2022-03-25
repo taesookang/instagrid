@@ -22,6 +22,7 @@
     "react-responsive": "^9.0.0-beta.6",
     "sass": "^1.49.0",
     "tailwindcss-border-gradients": "^2.0.3",
+    "use-debounce": "^7.0.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

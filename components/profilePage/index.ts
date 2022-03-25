@@ -1,0 +1,6 @@
+export { default as ProfileInfo } from "./ProfileInfo"
+export { default as PostTabs } from "./PostTabs"
+export { default as PostGrid } from "./PostGrid"
+export { default as ThumbnailOverlay } from "./ThumbnailOverlay"
+export { default as EditProfileButton } from "./EditProfileButton"
+export { default as ProfileDashboard } from "./ProfileDashboard"

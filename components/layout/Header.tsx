@@ -1,40 +1,50 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { IoSearchOutline, IoCloseCircle } from "react-icons/io5";
-import { TailSpin } from "react-loader-spinner";
+
+// hooks & context
 import { useOutsideClickListenerRef } from "../../hooks/useOutsideClickListenerRef";
 import { useRouter } from "next/router";
-
 import { useAuth } from "../../context/AuthContext";
 import { useGlobalContext } from "../../context/GlobalContext";
 
-import { ModalCreatePost, ModalPost } from "../modals";
-
-
-import { auth } from "../../firebase";
+// firebase
+import { auth, db } from "../../firebase";
 import { signOut } from "firebase/auth";
+import { doc, onSnapshot  } from 'firebase/firestore'
+
+// components
+import { ModalCreatePost } from "../modals";
 import HeaderMenu from "./HeaderMenu";
+import SearchBar from "./searchBar/SearchBar";
+
 
 export const Header: React.FC = () => {
-  const [inputIsFocused, setInputIsFocused] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
+  
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null);
 
   const { createPostModalOpen, setCreatePostModalOpen } = useGlobalContext()
-
   const router = useRouter();
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const inputBoxRef = useOutsideClickListenerRef(() => {
-    setInputIsFocused(false);
-  });
 
   const userMenuRef = useOutsideClickListenerRef(() => {
     setMenuOpen(false)
   })
 
   const { currentUser } = useAuth();
+
+  useEffect(() => {
+    if (currentUser) {
+      const userDoc = doc(db, "users", currentUser.id);
+      const unsubscribe = onSnapshot(userDoc, (doc) => {
+        const userData = doc.data();
+        setUserPhotoUrl(userData?.photoUrl);
+      });
+
+      return () => unsubscribe();
+    }
+  }, [currentUser]);
 
   const logout = async () => {
     signOut(auth).then(() => {
@@ -59,42 +69,14 @@ export const Header: React.FC = () => {
             </a>
           </Link>
 
-          <div
-            className="w-64 h-9 bg-[#efefef] rounded-md flex items-center px-4 py-[2px] cursor-text"
-            ref={inputBoxRef}
-          >
-            <IoSearchOutline
-              className={`text-[#8E8E8E] w-6 h-6 mr-2 ${
-                inputIsFocused && "hidden"
-              }`}
-            />
-            <input
-              className={`w-full placeholder:font-[300] placeholder:text-[#8E8E8E] focus:border-none bg-transparent ${
-                inputIsFocused ? "text-gray-800" : "text-gray-400"
-              }`}
-              type="text"
-              placeholder="Search"
-              onFocus={() => setInputIsFocused(true)}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              ref={inputRef}
-            />
-            <div onClick={() => setSearchTerm("")}>
-              <IoCloseCircle
-                className={`text-[#c7c7c7] w-6 h-6 ml-2 cursor-default ${
-                  !inputIsFocused && "hidden"
-                }`}
-              />
-            </div>
-            {/* <TailSpin height={16} width={16} color="#a7a7a7" /> */}
-          </div>
+          <SearchBar />
 
           <div className="flex items-center justify-around w-36 !z-30">
             <Link href="/">
               <a className="relative w-6 h-6">
                 <Image
                   src={`/icons/home_${
-                    router.pathname === "/" && !createPostModalOpen
+                    router.pathname === "/" && !router.query["explore"] && !createPostModalOpen
                       ? "fill"
                       : "outline"
                   }.svg`}
@@ -122,11 +104,13 @@ export const Header: React.FC = () => {
               >
                 <Image
                   src={
-                    currentUser?.photoUrl
-                      ? currentUser.photoUrl
+                    userPhotoUrl
+                      ? userPhotoUrl
                       : "/icons/user.svg"
                   }
                   layout="fill"
+                  objectFit="cover"
+                  objectPosition="center"
                 />
               </div>
               <HeaderMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} logout={logout} />

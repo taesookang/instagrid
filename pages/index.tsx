@@ -1,47 +1,51 @@
 import { ReactElement, useEffect } from "react";
-import React, { useState } from "react";
+import React from "react";
 import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { Layout } from "../components/layout";
 import { PostCard, NoPosts } from "../components/post";
 import { auth, db } from "../firebase";
-import { IUser, IPost, ISuggestedUser } from "../types";
+import { IUserEssentials } from "../types";
 import { onAuthStateChanged } from "firebase/auth";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-  where,
-  arrayUnion,
-  updateDoc,
-} from "firebase/firestore";
-
 import { useAuth } from "../context/AuthContext";
-import {
-  GetStaticProps,
-  GetStaticPaths,
-  GetServerSideProps,
-  GetServerSidePropsContext,
-} from "next";
+import { GetServerSideProps } from "next";
 
 import nookies from "nookies";
 
 import { verifyIdToken } from "../firebase/admin";
-import { getPostsByUsername, getPostsByUserId } from '../firebase/service';
+import { getPostsByUserId, getSuggestionsById } from "../firebase/service";
 import { IPostWithUserData } from "../types/index";
+
+import {
+  doc,
+  getDoc,
+  // collection,
+  // getDocs,
+  // query,
+  // where,
+  // onSnapshot,
+} from "firebase/firestore";
+import { Suggested, SuggestedUser } from "../components/suggestions";
+// import { getPostDataFromDoc,getPostsByUserId } from "../firebase/service";
+// import { orderBy } from "firebase/firestore";
+
+// I came up with two logics to render posts:
+// (1) Serverside rendering (default)
+// - doesn't support realtime update but UI is stable.
+// (2) Listening to posts database
+// - everytime something is changed in the post it renders the whole post list again, which occurs a blinking post card UI.
 
 export default function Home({
   posts,
   suggestions,
 }: {
   posts: IPostWithUserData[] | [];
-  suggestions: ISuggestedUser[] | [];
+  suggestions: IUserEssentials[] | [];
 }) {
+  // const [posts, setPosts] = useState<IPostWithUserData[]>([]);
   const router = useRouter();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     onAuthStateChanged(auth, async (user) => {
@@ -51,10 +55,30 @@ export default function Home({
     });
   }, [auth]);
 
-  const { currentUser } = useAuth();
+  
+  // useEffect(() => {
+  //   if (currentUser) {
+  //     const q = query(
+  //       collection(db, "posts"),
+  //       where("userId", "in", [currentUser.id, ...currentUser.followings.map((follower) => follower.id)]),
+  //       orderBy("createdAt")
+  //     );
+  //     const unsubscribe = onSnapshot(q, (postSnapshot) => {
+  //       postSnapshot.forEach(async (doc) => {
+  //         const post = await getPostDataFromDoc(doc);
+  //         setPosts((prev) => [post, ...prev.filter((p) => p.id !== post.id)]);
+  //       })
+  //     })
+
+  //     return () => unsubscribe();
+  //   }
+  // }, [currentUser]);
 
   return (
     currentUser && (
+      router.query["explore"] ?
+      <Suggested suggestions={suggestions} />
+      :
       <>
         <div className="min-h-section h-full flex justify-center items-center">
           <Head>
@@ -92,51 +116,20 @@ export default function Home({
                 </div>
               </div>
 
-              <div className="mt-2 w-full flex items-center justify-between" >
-                <p className="capitalize text-gray-400 font-semibold tracking-wide text-sm" >
+              <div className="mt-2 w-full flex items-center justify-between">
+                <p className="capitalize text-gray-400 font-semibold tracking-wide text-sm">
                   Suggestions for you
                 </p>
-                <span className="capitalize text-xs font-[500] cursor-pointer">
+                <button className="capitalize text-xs font-[500]"
+                  onClick={() => router.push({pathname:router.asPath, query: { explore: "people" }}, "/explore/people")}
+                >
                   see all
-                </span>
+                </button>
               </div>
 
               <div className="flex flex-col py-2">
-                {suggestions?.map((suggestedUser) => (
-                  <div className="flex items-center justify-between w-full h-12 py-2 px-4">
-                    <div className="relative min-w-[32px] w-8 h-8 rounded-full overflow-hidden mr-3 bg-gray-100 border border-gray-200" >
-                      <Image
-                        src={
-                          suggestedUser.photoUrl
-                            ? suggestedUser.photoUrl
-                            : "/icons/user.svg"
-                        }
-                        layout="fill"
-                        objectFit="cover"
-                        objectPosition="center"
-                      />
-                    </div>
-                    <div className="flex flex-col h-full w-full justify-between">
-                      <span className="text-sm leading-none">
-                        {suggestedUser.username}
-                      </span>
-                      <p className="text-sm leading-none text-gray-400">
-                        {suggestedUser.followers.length
-                          ? `Followed by ${suggestedUser.followers[0]}`
-                          : "No followers"}
-                      </p>
-                    </div>
-                    <button
-                      className="text-button-primary text-xs font-semibold tracking-wide"
-                      onClick={() => {
-                        updateDoc(doc(db, "users", suggestedUser.username), {
-                          followers: arrayUnion(currentUser?.username),
-                        });
-                      }}
-                    >
-                      Follow
-                    </button>
-                  </div>
+                {suggestions?.slice(0,5).map((suggestedUser) => (
+                  <SuggestedUser suggestedUser={suggestedUser} key={suggestedUser.id} />
                 ))}
               </div>
             </div>
@@ -152,7 +145,6 @@ Home.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const suggestions: ISuggestedUser[] = [];
   try {
     // parse & verify token cookie => get user id
     const cookies = nookies.get(ctx);
@@ -160,66 +152,18 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
       const verifiedToken = await verifyIdToken(cookies.token);
       const userId = verifiedToken.uid;
 
-      // get user info from database.
+      // pull out user info from database.
       const userDocRef = doc(db, "users", userId);
       const userDocSnap = await getDoc(userDocRef);
       const userData = userDocSnap.data();
 
-      // get posts
+      // get posts from serverside
 
-      const posts = await getPostsByUserId(userData?.id)
-      // const posts: IPostWithUserPhoto[] = [];
-
-      // const postsRef = collection(db, "posts");
-      // const postsQuery = query(
-      //   postsRef,
-      //   orderBy("createdAt", "desc"),
-      //   where("username", "==", userData?.username)
-      //   // where("userId", "array-contains", userData?.followings)
-      // );
-      // const postsSnapshot = await getDocs(postsQuery);
-      // postsSnapshot.forEach(async (doc) => {
-      //   const postData = doc.data();
-
-      //   const userPhotoUrl = await getUserPhotoUrl(postData.username);
-
-      //   const post: IPostWithUserPhoto = {
-      //     id: postData.id,
-      //     photos: postData.photos,
-      //     likes: postData.likes,
-      //     comments: postData.comments,
-      //     createdAt: postData.createdAt,
-      //     caption: postData.caption,
-      //     userPhotoUrl: userPhotoUrl,
-      //     username: postData.username,
-      //   };
-      //   posts.push(post);
-      // });
+      const posts = await getPostsByUserId(userData?.id);
 
       // get suggestions
 
-      // const usersRef = collection(db, "users");
-      // const usersQuery = query(
-      //   usersRef,
-      //   // orderBy("createdAt", "desc"),
-      //   where("id", "not-in", userData?.followings)
-
-      // );
-      const usersRef = collection(db, "users");
-
-      const usersQuery = query(usersRef, where("id", "!=", userData?.id));
-      const querySnapshot = await getDocs(usersQuery);
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const user: ISuggestedUser = {
-          id: data.id,
-          username: data.username,
-          photoUrl: data.photoUrl,
-          followers: data.followers,
-        };
-        suggestions.push(user);
-      });
-
+      const suggestions = await getSuggestionsById(userData?.id);
       return {
         props: {
           posts: posts,
@@ -234,6 +178,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   return {
     props: {
       posts: [],
+      suggestions: []
     },
   };
 };

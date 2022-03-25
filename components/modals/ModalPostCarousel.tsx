@@ -31,6 +31,7 @@ export const ModalPostCarousel: React.FC<Props> = ({ photos }) => {
             src={photo.url}
             priority
             layout="fill"
+            objectFit='cover'
             objectPosition="center"
             key={photo.name}
           />

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/router'
 import {
   query,
   collection,
@@ -22,10 +23,9 @@ interface Props {
 export const CommentList: React.FC<Props> = ({ postId, type }) => {
   const [comments, setComments] = useState<IComment[] | []>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedComment, setSelectedComment] = useState<IComment["id"] | null>(
-    null
-  );
+  const [selectedComment, setSelectedComment] = useState<IComment["id"] | null>(null);
 
+  const router = useRouter()
   // real time comments update effect
   useEffect(() => {
     const q = query(
@@ -74,7 +74,7 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
     <>
       {comments.map((comment: IComment) => (
         <p className="text-sm mb-1" key={comment.id}>
-          <span className="font-[500] hover:underline cursor-pointer">
+          <span className="font-[500] hover:underline cursor-pointer" onClick={() => router.push(`/${comment.username}`) }>
             {comment.username}
           </span>{" "}
           {comment.value}
@@ -98,7 +98,6 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
         <Comment
         key={comment.id}
           comment={comment}
-          modalOpen={modalOpen}
           setModalOpen={setModalOpen}
           setSelectedComment={setSelectedComment}
         />

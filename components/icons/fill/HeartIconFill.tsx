@@ -3,22 +3,20 @@ import React from "react";
 interface Props {
   className?: string;
   color: string;
-  width: number;
-  height: number;
+  size: number;
   fill?: boolean;
 }
 
 export const HeartIconFill: React.FC<Props> = ({
   className,
   color,
-  width,
-  height,
+  size
 }) => {
   return (
     <div className={className}>
       <svg
-        width={width}
-        height={height}
+        width={size}
+        height={size}
         viewBox="0 0 50 50"
         fill={color}
         xmlns="http://www.w3.org/2000/svg"

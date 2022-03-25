@@ -17,7 +17,7 @@ const firebaseConfig = {
 
 // Initialize firebase
 export const app = initializeApp(firebaseConfig);
-const firebaseApp = getApp()
+ const firebaseApp = getApp()
 // Firebase services
 export const db = getFirestore(app)
 export const auth = getAuth(app)
@@ -28,9 +28,9 @@ export const signInWithFacebook = () => {
   signInWithPopup(auth, provider)
   .then((result) => {
   console.log(result);
-  
   })
   .catch((error) => {
     console.log(error);
   });
 }
+

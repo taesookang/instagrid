@@ -1,1 +1,5 @@
 export { default as HeartIconOutlined } from "./HeartIconOutlined"
+export { default as BookMarkOutlined } from "./BookMarkOutlined"
+export { default as CameraOutlined } from "./CameraOutlined"
+export { default as SaveTabIcon } from "./SaveTabIcon"
+export { default as GridTabIcon } from "./GridTabIcon"

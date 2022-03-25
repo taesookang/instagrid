@@ -8,6 +8,7 @@ module.exports = {
       minHeight : {
         'section': 'calc(100vh - 60px)'
       },
+        
       dropShadow: {
         'menu': '0 0px 3px rgba(0, 0, 0, 0.2)',
       },
@@ -15,6 +16,9 @@ module.exports = {
         "2xs": "10px",
       },
       colors: {
+        basic: {
+          black: '#262626'
+        },
         button: {
           primary: "#0096F6",
           disabled: "#C0DFFD",

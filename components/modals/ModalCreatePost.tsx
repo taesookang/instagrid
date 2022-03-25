@@ -1,8 +1,10 @@
 // General
 import React, { useState } from "react";
 import Image from "next/image";
+import { useRouter } from 'next/router'
 import { IPhoto, IPost } from "../../types";
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
+
 // Icons
 import { IoClose } from "react-icons/io5";
 import { HiOutlineArrowLeft } from "react-icons/hi";
@@ -23,11 +25,9 @@ import { useAuth } from "../../context/AuthContext";
 Modal.setAppElement("#__next");
 
 interface Props {
-  isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
-
 
 export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -36,6 +36,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const [caption, setCaption] = useState("");
 
   const { currentUser } = useAuth();
+  const router = useRouter()
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -49,6 +50,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
       userId: currentUser?.id!,
       photos: [],
       likes: [],
+      savedBy: [],
       comments: [],
       createdAt: Date.now(),
       caption: caption,
@@ -62,10 +64,10 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
         .then((snapshot) => {
           getDownloadURL(snapshot.ref)
             .then((url) => {
-              const photo:IPhoto = {
+              const photo: IPhoto = {
                 name: imageId,
-                url: url
-              }
+                url: url,
+              };
               newPost.photos.push(photo);
             })
             .then(async () => {
@@ -79,23 +81,23 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
     setUploadIsDone(true);
   };
 
-
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={() => {
-        setIsOpen(false)
+        setIsOpen(false);
         setSelectedFiles([]);
         setUploadIsDone(false);
         setOpenCaptionInput(false);
         setCaption("");
+        uploadIsDone && router.reload()
       }}
       contentLabel="Create Post"
       className={`absolute bg-white ${
         openCaptionInput
           ? "w-[348px] sm:w-[90%] max-w-[910px] sm:min-w-[570px] min-w-[348px]"
           : "w-1/2 max-w-[570px] min-w-[348px]"
-      }  max-h-[613px] animate-scaleDown rounded-xl overflow-hidden transtion-all duration-300 ease-in-out`}
+      } h-fit max-h-[613px] animate-scaleDown rounded-xl overflow-hidden transtion-all duration-300 ease-in-out`}
       overlayClassName="modal-create__overlay"
     >
       <IoClose
@@ -130,8 +132,8 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
       <div className="flex w-full">
         <div
           className={`${
-            openCaptionInput ? "w-1/2 lg:w-2/3 hidden sm:flex" : "w-full"
-          } max-w-[570px] h-full flex items-center justify-center aspect-square `}
+            openCaptionInput ? "w-fit lg:w-2/3 hidden sm:flex" : "w-full"
+          } max-w-[570px] h-full flex items-center justify-center aspect-square`}
         >
           {uploadIsDone ? (
             <div className="flex flex-col items-center justify-center ">
@@ -149,7 +151,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
               responsive={carouselResponsive}
               keyBoardControl={true}
               customTransition="all .01"
-              containerClass="carousel-container w-full"
+              containerClass="w-full"
               removeArrowOnDeviceType={["mobile"]}
               itemClass="relative w-full h-full"
               customLeftArrow={<CustomArrow theme="dark" direction="left" />}
@@ -160,7 +162,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
                 <Image
                   src={URL.createObjectURL(file)}
                   layout="responsive"
-                  objectFit="cover"
+                  objectFit="contain"
                   objectPosition="center"
                   width={570}
                   height={570}

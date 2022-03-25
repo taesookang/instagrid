@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
+import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/router";
 import { IoClose } from "react-icons/io5";
 import Modal from "react-modal";
 import { IPostWithUserData } from "../../types/index";
-import { LikeButton, PostHeader } from "../post";
+import { PostHeader } from "../post";
+import { LikeButton } from "../buttons";
 import { CommentList, CommentForm } from "../comments";
 import { getPostById } from "../../firebase/service";
 import { useMediaQuery } from "react-responsive";
@@ -20,6 +22,7 @@ export const ModalPost: React.FC<Props> = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useMediaQuery({ query: "(max-width: 640px)" });
+
 
   useEffect(() => {
     !!router.query.pid ? setIsOpen(true) : setIsOpen(false);
@@ -63,24 +66,25 @@ export const ModalPost: React.FC<Props> = () => {
       )}
       <div className=" w-full h-full max-w-[500px] bg-white flex flex-col justify-between">
         <PostHeader
+          userId={post?.userId!}
           userPhotoUrl={post?.userPhotoUrl!}
           username={post?.username!}
           postId={post?.id!}
         />
         {post && isMobile && <ModalPostCarousel photos={post.photos} />}
         <div className="w-full h-full overflow-y-scroll hidden sm:flex p-4 flex-col">
-          <div className="flex min-h-[84px] w-full mt-4">
+          <div className="flex min-h-fit w-full mt-4">
             <div className="relative min-w-[32px] min-h-[32px] w-8 h-8 overflow-hidden rounded-full mr-4">
               <Image
                 src={`${
-                  post?.userPhotoUrl
-                    ? post.userPhotoUrl
-                    : "/icons/user.svg"
+                  post?.userPhotoUrl ? post.userPhotoUrl : "/icons/user.svg"
                 }`}
                 layout="fill"
+                objectFit="cover"
+                objectPosition="center"
               />
             </div>
-            <div className="flex flex-col w-full max-h-36">
+            <div className="flex flex-col w-full h-fit">
               <p className="text-sm">
                 <span className="font-[500] hover:underline cursor-pointer">
                   {post?.username}
@@ -96,7 +100,8 @@ export const ModalPost: React.FC<Props> = () => {
           </div>
           <CommentList postId={postId} type="modal" />
         </div>
-        <div className="p-2">
+        <div className="w-full h-2 bg-white sm:block hidden" />
+        <div className="p-2 border-t border-gray-200">
           <LikeButton postId={postId} />
           <span className="uppercase text-[10px] text-gray-400 tracking-wider mx-2">
             {moment(post?.createdAt).format("MMMM, DD, YYYY")}

@@ -5,17 +5,18 @@ export interface IUser {
     email: string
     excerpt: string | null
     photoUrl: string | null
-    followers: IUser["id"][] | []
-    followings: IUser["id"][] | []
+    followers: Follower[]
+    followings: Follower[]
 }
 
-export interface ISuggestedUser {
+export declare type Follower = {id: IUser["id"], username: IUser["username"]}
+
+export interface IUserEssentials {
     id: IUser["id"]
     username: IUser["username"]
-    followers: IUser["followers"]
+    followers: Follower[]
     photoUrl: IUser["photoUrl"]
 }
-
 
 export interface IComment {
     id: string
@@ -36,6 +37,7 @@ export interface IPost {
     id: string
     photos: IPhoto[]
     likes: IUser[] | []
+    savedBy: IUser[] | []
     comments: IComment["id"][] | []
     createdAt: number
     caption: string | null
@@ -47,7 +49,8 @@ export interface IPostWithUserData extends IPost {
     userPhotoUrl: IUser["photoUrl"]
 }
 
-
-
-
-
+export interface ISearchedUser {
+    photoUrl: string;
+    username: string;
+    excerpt?: string;
+  }

@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import Image from "next/image";
-import { PostHeader, LikeButton } from ".";
-import { CommentList, CommentForm } from '../comments'
+import { useAuth } from '../../context/AuthContext'
+import { PostHeader } from ".";
+import { LikeButton, SaveButton } from "../buttons";
+import { CommentList, CommentForm } from "../comments";
 
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
 
@@ -17,13 +19,16 @@ interface Props {
 }
 
 export const PostCard: React.FC<Props> = ({ post }) => {
-  console.log(post);
-  
+  const [captionClamped, setCaptionClamped] = useState(
+    post.caption?.length! > 70
+  );
+
   return (
-    <div className="post mt-8 w-full">
+    <div className="post mt-8 w-full last:mb-8">
       <PostHeader
         userPhotoUrl={post?.userPhotoUrl!}
         username={post.username}
+        userId={post.userId}
         postId={post.id}
       />
       <Carousel
@@ -34,39 +39,57 @@ export const PostCard: React.FC<Props> = ({ post }) => {
         showDots={post.photos.length > 1 && true}
         renderDotsOutside
         removeArrowOnDeviceType={["mobile"]}
-        containerClass="carousel-container w-full"
+        containerClass="w-full bg-[#262626]"
         itemClass="relative w-full"
         dotListClass="!relative flex items-center justify-center"
         customLeftArrow={<CustomArrow theme="light" direction="left" />}
         customRightArrow={<CustomArrow theme="light" direction="right" />}
         customDot={<CustomDots outside={true} />}
       >
-        {post.photos.map((photo) => (
-          <Image
-            src={photo.url}
-            priority
-            layout="responsive"
-            objectFit="cover"
-            objectPosition="center"
-            width={612}
-            height={612}
-            key={photo.name}
-          />
-        ))}
+        {post.photos.map((photo) =>
+          post.photos.length > 1 ? (
+            <Image
+              src={photo.url}
+              priority
+              layout="responsive"
+              objectFit="contain"
+              objectPosition="center"
+              width={612}
+              height={612}
+              key={photo.name}
+            />
+          ) : (
+            <img src={photo.url} className="w-full" key={photo.name}/>
+          )
+        )}
       </Carousel>
       <div
-        className={`w-full ${post.photos.length > 1 ? "-mt-4" : "mt-2"} ml-2`}
+        className={`w-full ${
+          post.photos.length > 1 ? "-mt-4" : "mt-2"
+        } px-2 flex justify-between`}
       >
         <LikeButton postId={post.id} />
+        <SaveButton postId={post.id} />
       </div>
       <div className="px-4">
-        <div className="flex text-sm">
-          <p className="leading-2 line-clamp-2">
+        <div className="text-sm mb-2">
+          <p
+            className={`leading-2 ${
+              captionClamped ? "line-clamp-1" : "line-clamp-none"
+            } `}
+          >
             <span className="font-[500] mr-2">{post.username}</span>
             {post.caption}
           </p>
+          {captionClamped && (
+            <button
+              className="text-sm text-gray-400"
+              onClick={() => setCaptionClamped(false)}
+            >
+              more
+            </button>
+          )}
         </div>
-        <button className="text-sm text-gray-500">more</button>
         <CommentList postId={post.id} type="card" />
         <p className="uppercase text-2xs text-gray-500 my-2 tracking-wide">
           {moment(post.createdAt).fromNow()}
