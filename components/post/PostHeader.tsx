@@ -58,12 +58,11 @@ export const PostHeader: React.FC<Props> = ({
       //       setDeletePostModalOpen(false),
       //     ])
       // })
-      await onClickEvents()
-      
+      setIsOpen(false);
+      router.back();
       setTimeout(async () => {
-       setIsOpen(false)
-      router.back()
-      }, 300)
+        await onClickEvents();
+      }, 300);
     } else {
       await onClickEvents();
     }

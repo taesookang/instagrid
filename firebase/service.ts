@@ -29,8 +29,7 @@ import {
   listAll,
 } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
-import { Follower } from "../types/index";
-
+import { Follower, IComment } from "../types/index";
 
 const postsRef = collection(db, "posts");
 const usersRef = collection(db, "users");
@@ -47,7 +46,7 @@ export const getPostUserData = async (id: string) => {
 export const getUserById = async (id: string) => {
   const userDoc = doc(db, "users", id);
   const userSnapshot = await getDoc(userDoc);
-  const user = getUserDataFromDoc(userSnapshot)
+  const user = getUserDataFromDoc(userSnapshot);
 
   return user;
 };
@@ -134,21 +133,21 @@ export const getPostsByUsername = async (username: string) => {
 };
 
 export const getPostsLengthById = async (id: string) => {
-  const posts: any[] = []
-  const q = query(postsRef, where("userId", "==", id))
-  const snapshot = await getDocs(q)
+  const posts: any[] = [];
+  const q = query(postsRef, where("userId", "==", id));
+  const snapshot = await getDocs(q);
 
   snapshot.forEach((item) => {
-    posts.push(item.data())
-  })
-  
-  return posts.length
-}
+    posts.push(item.data());
+  });
+
+  return posts.length;
+};
 export const getPostsByUserId = async (id: string) => {
   const posts: IPostWithUserData[] = [];
 
-  const user = await getUserById(id)
-  
+  const user = await getUserById(id);
+
   const q = query(
     postsRef,
     where("userId", "in", [id, ...user.followings.map((f) => f.id)]),
@@ -188,10 +187,15 @@ export const deletePost = async (postId: string) => {
   const postDoc = doc(db, "posts", postId);
   const post = await getDoc(postDoc);
   const photos = post.data()?.photos;
+  const comments = post.data()?.comments;
 
   photos.forEach((photo: IPhoto) => {
     const imagesRef = ref(storage, `images/${photo.name}`);
     deleteObject(imagesRef);
+  });
+
+  comments.forEach(async (comment: string) => {
+    await deleteComment(comment, postId);
   });
 
   await deleteDoc(postDoc);
@@ -299,14 +303,13 @@ export const getUsersBySearch = async (term: string) => {
   return users;
 };
 
-
 export const getSuggestionsById = async (id: string) => {
   const suggestions: IUserEssentials[] = [];
 
-  const userDoc = doc(db, "users", id)
-  const userSnapshot = await getDoc(userDoc)
-  const user = getUserDataFromDoc(userSnapshot)
-  
+  const userDoc = doc(db, "users", id);
+  const userSnapshot = await getDoc(userDoc);
+  const user = getUserDataFromDoc(userSnapshot);
+
   const usersQuery = query(usersRef, where("id", "!=", id));
   const querySnapshot = await getDocs(usersQuery);
   querySnapshot.forEach((doc) => {
@@ -320,10 +323,12 @@ export const getSuggestionsById = async (id: string) => {
     suggestions.push(user);
   });
 
-  const results = suggestions.filter((s) => !user.followings.map((x) => x.id).includes(s.id))
-  results.sort((a, b) => b.followers.length - a.followers.length)
+  const results = suggestions.filter(
+    (s) => !user.followings.map((x) => x.id).includes(s.id)
+  );
+  results.sort((a, b) => b.followers.length - a.followers.length);
 
-  return results
+  return results;
 };
 
 export const getSavedByUsername = async (username: string) => {
