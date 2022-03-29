@@ -1,7 +1,7 @@
 // General
 import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 import { IPhoto, IPost } from "../../types";
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
 
@@ -36,7 +36,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const [caption, setCaption] = useState("");
 
   const { currentUser } = useAuth();
-  const router = useRouter()
+  const router = useRouter();
 
   const handleCaptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
@@ -76,9 +76,8 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
         })
         .catch((err) => console.log(err));
     });
-
-    setSelectedFiles([]);
     setUploadIsDone(true);
+    setSelectedFiles([]);
   };
 
   return (
@@ -90,7 +89,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
         setUploadIsDone(false);
         setOpenCaptionInput(false);
         setCaption("");
-        uploadIsDone && router.reload()
+        uploadIsDone && router.reload();
       }}
       contentLabel="Create Post"
       className={`absolute bg-white ${

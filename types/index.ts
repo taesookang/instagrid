@@ -45,7 +45,7 @@ export interface IPost {
 }
 
 export interface IPostWithUserData extends IPost {
-    username: IUser["username"]
+    username: IUser["username"] 
     userPhotoUrl: IUser["photoUrl"]
 }
 

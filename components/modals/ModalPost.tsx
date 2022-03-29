@@ -47,6 +47,7 @@ export const ModalPost: React.FC<Props> = () => {
   }, [isOpen]);
 
   return (
+    post &&
     <Modal
       isOpen={isOpen}
       onRequestClose={() => {
@@ -75,6 +76,7 @@ export const ModalPost: React.FC<Props> = () => {
           userPhotoUrl={post?.userPhotoUrl!}
           username={post?.username!}
           postId={post?.id!}
+          setIsOpen={setIsOpen}
         />
         {post && isMobile && <ModalPostCarousel photos={post.photos} />}
         <div className="w-full h-full overflow-y-scroll hidden sm:flex p-4 flex-col">

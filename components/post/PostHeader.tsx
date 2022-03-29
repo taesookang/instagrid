@@ -5,13 +5,14 @@ import { useRouter } from "next/router";
 import { useAuth } from "../../context/AuthContext";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { OptionButton, OptionsModal } from "../modals";
-import { deletePost, UnfollowUser } from "../../firebase/service";
+import { deletePost, followUser, UnfollowUser } from "../../firebase/service";
 
 interface Props {
   userPhotoUrl: string;
   username: string;
   postId: string;
   userId: string;
+  setIsOpen?: React.Dispatch<React.SetStateAction<boolean>> | undefined;
 }
 
 export const PostHeader: React.FC<Props> = ({
@@ -19,8 +20,13 @@ export const PostHeader: React.FC<Props> = ({
   userId,
   username,
   postId,
+  setIsOpen = () => {},
 }) => {
   const { currentUser } = useAuth();
+  const followings = currentUser?.followings!;
+
+  const isFollowing = followings?.filter((f) => f.id === userId).length > 0;
+
   const router = useRouter();
   const [deletePostModalOpen, setDeletePostModalOpen] = useState(false);
   const isOwner = currentUser?.id === userId;
@@ -28,45 +34,46 @@ export const PostHeader: React.FC<Props> = ({
   const handleOnClick = async () => {
     const onClickEvents = async () => {
       isOwner
-        ? await deletePost(postId)
-        : await UnfollowUser(
-            { id: userId, username: username },
+        ? await deletePost(postId).then(() => setDeletePostModalOpen(false))
+        : isFollowing
+        ? await UnfollowUser(
+            { id: userId!, username: username },
+            { id: currentUser?.id!, username: currentUser?.username! }
+          )
+        : await followUser(
+            { id: userId!, username: username },
             { id: currentUser?.id!, username: currentUser?.username! }
           );
+
+      setTimeout(() => {
+        router.reload();
+      }, 500);
     };
 
-    await onClickEvents()
-      .then(() => {
-        setDeletePostModalOpen(false);
-      })
-      .then(() =>
-        setTimeout(() => {
-          router.reload();
-        }, 500)
-      );
+    if (router.query["pid"]) {
+      // await onClickEvents().then(() => {
+      //   Promise.all([
+      //       setIsOpen(false),
+      //       router.back(),
+      //       setDeletePostModalOpen(false),
+      //     ])
+      // })
+      await onClickEvents()
+      
+      setTimeout(async () => {
+       setIsOpen(false)
+      router.back()
+      }, 300)
+    } else {
+      await onClickEvents();
+    }
 
-    // isOwner
-    //   ? await deletePost(postId)
-    //       .then(() => {
-    //         setDeletePostModalOpen(false);
-    //       })
-    //       .then(() =>
-    //         setTimeout(() => {
-    //           router.reload();
-    //         }, 500)
-    //       )
-    //   : await UnfollowUser(
-    //       { id: userId, username: username },
-    //       { id: currentUser?.id!, username: currentUser?.username! }
-    //     )
-    //       .then(() => {
-    //         setDeletePostModalOpen(false);
-    //       })
-    //       .then(() =>
-    //         setTimeout(() => {
-    //           router.reload();
-    //         }, 500)
-    //       );
+    // await onClickEvents()
+    //   .then(() => {
+    //     setTimeout(() => {
+    //       router.reload();
+    //     }, 500);
+    //   });
   };
 
   return (
@@ -92,10 +99,10 @@ export const PostHeader: React.FC<Props> = ({
         setIsOpen={setDeletePostModalOpen}
       >
         <OptionButton
-          title={isOwner ? "Delete" : "Unfollow"}
+          title={isOwner ? "Delete" : isFollowing ? "Unfollow" : "Follow"}
           onClick={handleOnClick}
-          textRed
-          fontBold
+          textRed={!isOwner && !isFollowing ? false : true}
+          fontBold={!isOwner && !isFollowing ? false : true}
         />
         <OptionButton
           title="Cancel"

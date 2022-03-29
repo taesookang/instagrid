@@ -21,7 +21,7 @@ interface Props {
 export const LikeButton: React.FC<Props> = ({ postId }) => {
   const { currentUser } = useAuth();
 
-  const postDoc = doc(db, "posts", postId);
+  const postDoc = doc(db, "posts", postId!);
 
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState<string[]>([]);
