@@ -14,6 +14,7 @@ import Carousel from "react-multi-carousel";
 import Modal from "react-modal";
 import Dropzone from "react-dropzone";
 import { v4 as uuidv4 } from "uuid";
+
 // Firebase
 import { storage, db } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -21,6 +22,7 @@ import { doc, setDoc } from "firebase/firestore";
 
 // Auth
 import { useAuth } from "../../context/AuthContext";
+import { TailSpin } from "react-loader-spinner";
 
 Modal.setAppElement("#__next");
 
@@ -32,6 +34,7 @@ interface Props {
 export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploadIsDone, setUploadIsDone] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [openCaptionInput, setOpenCaptionInput] = useState(false);
   const [caption, setCaption] = useState("");
 
@@ -45,6 +48,7 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
 
   const uploadPost = async () => {
     setOpenCaptionInput(false);
+    setIsLoading(true);
     const newPost: IPost = {
       id: uuidv4(),
       userId: currentUser?.id!,
@@ -71,12 +75,14 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
               newPost.photos.push(photo);
             })
             .then(async () => {
-              await setDoc(postDoc, newPost);
+              await setDoc(postDoc, newPost).then(() => {
+                setIsLoading(false);
+                setUploadIsDone(true);
+              });
             });
         })
         .catch((err) => console.log(err));
     });
-    setUploadIsDone(true);
     setSelectedFiles([]);
   };
 
@@ -134,7 +140,11 @@ export const ModalCreatePost: React.FC<Props> = ({ isOpen, setIsOpen }) => {
             openCaptionInput ? "w-fit lg:w-2/3 hidden sm:flex" : "w-full"
           } max-w-[570px] h-full flex items-center justify-center aspect-square`}
         >
-          {uploadIsDone ? (
+          {isLoading ? (
+            <div>
+              <TailSpin width={58} height={58} color={"#49de80"} />
+            </div>
+          ) : uploadIsDone ? (
             <div className="flex flex-col items-center justify-center ">
               <div>
                 <BsCheckCircleFill className="w-24 h-24 text-green-400 animate-scaleUp my-4" />

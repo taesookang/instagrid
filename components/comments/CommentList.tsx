@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
+import Link from "next/link";
 import {
   query,
   collection,
@@ -17,15 +18,17 @@ import { OptionsModal, OptionButton } from "../modals";
 
 interface Props {
   postId: string;
-  type: "card" | "modal";
 }
 
-export const CommentList: React.FC<Props> = ({ postId, type }) => {
+export const CommentList: React.FC<Props> = ({ postId }) => {
   const [comments, setComments] = useState<IComment[] | []>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedComment, setSelectedComment] = useState<IComment["id"] | null>(null);
+  const [selectedComment, setSelectedComment] = useState<IComment["id"] | null>(
+    null
+  );
 
-  const router = useRouter()
+  const router = useRouter();
+
   // real time comments update effect
   useEffect(() => {
     const q = query(
@@ -37,12 +40,10 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       querySnapshot.forEach(async (document) => {
         const data = document.data();
-        let userPhotoUrl = null;
-        if (type === "modal") {
-          const userDoc = doc(db, "users", data.userId);
-          const userSnapshot = await getDoc(userDoc);
-          userPhotoUrl = userSnapshot.data()?.photoUrl;
-        }
+        const userDoc = doc(db, "users", data.userId);
+        const userSnapshot = await getDoc(userDoc);
+        const userPhotoUrl = userSnapshot.data()?.photoUrl;
+
         const comment: IComment = {
           id: data.id,
           postId: data.postId,
@@ -70,18 +71,7 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
     });
   };
 
-  return type === "card" ? (
-    <>
-      {comments.map((comment: IComment) => (
-        <p className="text-sm mb-1" key={comment.id}>
-          <span className="font-[500] hover:underline cursor-pointer" onClick={() => router.push(`/${comment.username}`) }>
-            {comment.username}
-          </span>{" "}
-          {comment.value}
-        </p>
-      ))}
-    </>
-  ) : (
+  return (
     <>
       {/* Delete comment option modal */}
       <OptionsModal isOpen={modalOpen} setIsOpen={setModalOpen}>
@@ -96,7 +86,7 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
       {/* */}
       {comments.map((comment: IComment) => (
         <Comment
-        key={comment.id}
+          key={comment.id}
           comment={comment}
           setModalOpen={setModalOpen}
           setSelectedComment={setSelectedComment}
@@ -105,5 +95,4 @@ export const CommentList: React.FC<Props> = ({ postId, type }) => {
     </>
   );
 };
-
 export default CommentList;

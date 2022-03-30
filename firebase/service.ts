@@ -29,7 +29,7 @@ import {
   listAll,
 } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
-import { Follower, IComment } from "../types/index";
+import { Follower } from "../types/index";
 
 const postsRef = collection(db, "posts");
 const usersRef = collection(db, "users");

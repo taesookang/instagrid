@@ -51,8 +51,8 @@ export const ModalPost: React.FC<Props> = () => {
     <Modal
       isOpen={isOpen}
       onRequestClose={() => {
-        setIsOpen(false), setPost(null), router.back();
-        router.replace(`${router.query.username}`, undefined, {
+        setIsOpen(false), setPost(null)
+        router.replace(`${router.query.username ? router.query.username : "/"}`, undefined, {
           shallow: true,
         });
       }}
@@ -105,7 +105,7 @@ export const ModalPost: React.FC<Props> = () => {
               </div>
             </div>
           </div>
-          <CommentList postId={postId} type="modal" />
+          <CommentList postId={postId} />
         </div>
         <div className="w-full h-2 bg-white sm:block hidden" />
         <div className="p-2 border-t border-gray-200">

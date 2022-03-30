@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 // components
 import { PostHeader } from ".";
 import { LikeButton, SaveButton } from "../buttons";
-import { CommentList, CommentForm } from "../comments";
+import { CommentForm } from "../comments";
+
+// firebase
+import { onSnapshot, doc } from "firebase/firestore";
 
 // custom
 import { CustomArrow, CustomDots, carouselResponsive } from "../custom";
@@ -15,6 +20,7 @@ import moment from "moment";
 
 // types
 import { IPostWithUserData } from "../../types";
+import { db } from "../../firebase";
 
 interface Props {
   post: IPostWithUserData;
@@ -24,6 +30,22 @@ export const PostCard: React.FC<Props> = ({ post }) => {
   const [captionClamped, setCaptionClamped] = useState(
     post.caption?.length! > 70
   );
+  const [commentLength, setCommentLength] = useState(0);
+  const [myComments, setMyComments] = useState([])
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const postDoc = doc(db, "posts", post.id);
+
+    const unsubscribe = onSnapshot(postDoc, (doc) => {
+      const comments = doc.data()?.comments;
+      setCommentLength(comments.length);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
 
   return (
     <div className="post mt-8 w-full last:mb-8">
@@ -61,7 +83,7 @@ export const PostCard: React.FC<Props> = ({ post }) => {
               key={photo.name}
             />
           ) : (
-            <img src={photo.url} className="w-full" key={photo.name}/>
+            <img src={photo.url} className="w-full" key={photo.name} />
           )
         )}
       </Carousel>
@@ -92,7 +114,23 @@ export const PostCard: React.FC<Props> = ({ post }) => {
             </button>
           )}
         </div>
-        <CommentList postId={post.id} type="card" />
+        {commentLength > 0 && (
+          // <Link onClick={() => router.push({ pathname: router.asPath, query: { pid: postId } })}>
+          <Link
+            scroll={false}
+            href={{ pathname: router.asPath, query: { pid: post.id } }}
+          >
+            <a className="text-sm text-gray-400">
+              View{" "}
+              {commentLength > 1
+                ? `all ${commentLength} comments`
+                : "1 comment"}
+            </a>
+          </Link>
+        )}
+        {
+
+        }
         <p className="uppercase text-2xs text-gray-500 my-2 tracking-wide">
           {moment(post.createdAt).fromNow()}
         </p>
