@@ -35,11 +35,19 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-[350px]">
+    <div className="relative w-[350px]">
+      <p className="absolute -top-10 left-0 text-gray-400 text-sm w-full flex justify-center">
+        Click on the logo to try with testing account 😉
+      </p>
       <div className="border-box w-full min-h-[360px] bg-white flex flex-col items-center py-[10px]">
-        <div className="my-3">
+        <button className="my-3"
+          onClick={() => {
+            setEmail("test@test.com")
+            setPassword("testing")
+          }}
+        >
           <Image src={"/logo.svg"} width={175} height={60} />
-        </div>
+        </button>
         <form
           className="flex flex-col items-center w-[80%]"
           onSubmit={handleSubmit}
@@ -67,7 +75,7 @@ const LoginForm: React.FC = () => {
               <br /> Please check your email and password.
             </div>
           )}
-          <div onClick={signInWithFacebook} className="flex items-center text-ocean font-[500] my-3 cursor-pointer">
+          <div onClick={signInWithFacebook} className="flex items-center text-ocean font-[500] cursor-pointer">
             <AiFillFacebook className="mr-2 w-5 h-5" color="#375185" />
             <p>Log in with Facebook</p>
           </div>

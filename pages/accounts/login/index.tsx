@@ -4,7 +4,7 @@ import { LoginForm, SwitchBox } from "../../../components/authForm";
 
 const LoginPage = () => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <div className="relative flex flex-col items-center justify-center min-h-screen py-2">
       <Head>
         <title>Login - Instagrid</title>
         <link rel="icon" href="/favicon.ico" />
