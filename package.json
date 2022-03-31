@@ -21,7 +21,7 @@
     "react-multi-carousel": "^2.6.5",
     "react-responsive": "^9.0.0-beta.6",
     "sass": "^1.49.0",
-    "tailwindcss-border-gradients": "^2.0.3",
+    "tailwindcss-border-gradient-radius": "^3.0.1",
     "use-debounce": "^7.0.1",
     "uuid": "^8.3.2"
   },

@@ -51,13 +51,6 @@ export const PostHeader: React.FC<Props> = ({
     };
 
     if (router.query["pid"]) {
-      // await onClickEvents().then(() => {
-      //   Promise.all([
-      //       setIsOpen(false),
-      //       router.back(),
-      //       setDeletePostModalOpen(false),
-      //     ])
-      // })
       setIsOpen(false);
       router.back();
       setTimeout(async () => {
@@ -66,13 +59,6 @@ export const PostHeader: React.FC<Props> = ({
     } else {
       await onClickEvents();
     }
-
-    // await onClickEvents()
-    //   .then(() => {
-    //     setTimeout(() => {
-    //       router.reload();
-    //     }, 500);
-    //   });
   };
 
   return (
@@ -81,7 +67,7 @@ export const PostHeader: React.FC<Props> = ({
         className="flex items-center cursor-pointer"
         onClick={() => router.push(`/${username}`)}
       >
-        <div className="w-10 h-10 flex items-center justify-center rounded-full border-2 border-red-300 mr-2">
+        <div className="w-10 h-10 flex items-center justify-center rounded-full gradient-border-2 border-gradient-tr-yellow-red-purple-gray-50  mr-2">
           <Image
             src={`${userPhotoUrl ? userPhotoUrl : "/icons/user.svg"}`}
             width={32}

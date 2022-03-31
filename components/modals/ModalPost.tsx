@@ -19,6 +19,7 @@ import { PostHeader } from "../post";
 import { LikeButton } from "../buttons";
 import { CommentList, CommentForm } from "../comments";
 import { ModalPostCarousel } from ".";
+import { useCallback } from 'react';
 
 interface Props {}
 
@@ -32,6 +33,7 @@ export const ModalPost: React.FC<Props> = () => {
   useEffect(() => {
     !!router.query.pid ? setIsOpen(true) : setIsOpen(false);
   }, [router.query.pid]);
+
   const { pid } = router.query;
 
   const postId = pid as string;

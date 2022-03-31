@@ -2,6 +2,7 @@ import React from "react";
 import { IComment } from "../../types";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useAuth } from "../../context/AuthContext";
 import moment from "moment";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 
@@ -17,7 +18,8 @@ export const Comment: React.FC<Props> = ({
   setSelectedComment,
 }) => {
   const router = useRouter();
-
+  const { currentUser } = useAuth();
+  
   return (
     <div className="comment flex min-h-fit w-full mt-4">
       <div className="relative min-w-[32px] min-h-[32px] w-8 h-8 overflow-hidden rounded-full mr-4">
@@ -42,15 +44,17 @@ export const Comment: React.FC<Props> = ({
           <span className="text-xs text-gray-400">
             {moment(comment.createdAt).fromNow(true)}
           </span>
-          <div
-            className="comment__menu ml-2 cursor-pointer"
-            onClick={() => {
-              setModalOpen(true);
-              setSelectedComment(comment.id);
-            }}
-          >
-            <HiOutlineDotsHorizontal size={24} color={"#9CA3AF"} />
-          </div>
+          {currentUser?.id === comment.userId && (
+            <button
+              className="comment__menu ml-2"
+              onClick={() => {
+                setModalOpen(true);
+                setSelectedComment(comment.id);
+              }}
+            >
+              <HiOutlineDotsHorizontal size={24} color={"#9CA3AF"} />
+            </button>
+          )}
         </div>
       </div>
     </div>
