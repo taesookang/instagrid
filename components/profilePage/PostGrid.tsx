@@ -22,6 +22,8 @@ export const PostGrid: React.FC<Props> = ({ user, postsType }) => {
 
   const router = useRouter();
 
+  const { username } = router.query
+
   useEffect(() => {
     const getPosts = async () => {
       setIsLoading(true);
@@ -35,7 +37,7 @@ export const PostGrid: React.FC<Props> = ({ user, postsType }) => {
       }, 400);
     };
     user.username && getPosts();
-  }, [postsType]);
+  }, [postsType, username]);
   return (
     <>
       {postsType === "saved" && !isLoading && posts.length > 0 && (
