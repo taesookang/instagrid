@@ -1,27 +1,25 @@
-# Next.js + Tailwind CSS Example
+# Instagrid
 
-This example shows how to use [Tailwind CSS](https://tailwindcss.com/) [(v3.0)](https://tailwindcss.com/blog/tailwindcss-v3) with Next.js. It follows the steps outlined in the official [Tailwind docs](https://tailwindcss.com/docs/guides/nextjs).
+Instagram is one of the most frequently used apps for me, and I often thought about cloning it when I used the app. Although there were already a plenty of Instagram cloned app built by other developers, I wanted to build my own version of the app with detailed UI cloning, utilizing my own logic and abilities to solve problems. Here is the outcome.
 
-## Preview
+## Demo
 
-Preview the example live on [StackBlitz](http://stackblitz.com/):
+[![Go to Live](https://firebasestorage.googleapis.com/v0/b/instagrid-beafb.appspot.com/o/btn-link.svg?alt=media&token=2b3c5b08-9f84-4975-a3cc-150ce45c7f26)](https://instagrid.vercel.app/)
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/vercel/next.js/tree/canary/examples/with-tailwindcss)
+![alt text](demo.gif)
 
-## Deploy your own
+## Stacks
+- Next JS
+- Typescript 
+- Tailwind CSS + SCSS
+- Firebase 9
+- Figma (for logos & icons design)
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+## What I learned from this project
+The biggest mistake I made during building this app was not to take enough time for structurizing data. It occured hundreds errors of course, therefore I needed to spend more time for debugging and changing types. The most important lesson I learned from this project is that the more time for planning the less time for debugging. 
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-tailwindcss&project-name=with-tailwindcss&repository-name=with-tailwindcss)
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
-
-```bash
-npx create-next-app --example with-tailwindcss with-tailwindcss-app
-# or
-yarn create next-app --example with-tailwindcss with-tailwindcss-app
-```
-
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+- How to use **debounced value** for searching query.
+- Concepts of **cookie and session** and when to use them. 
+- How to make and import **svg icons** from Figma and turn them into **react components**. 
+- Animating UI building with Tailwind CSS.
+- Best practice of **Firebase 9** authentication & admin SDK, firestore, storage.

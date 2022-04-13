@@ -54,9 +54,7 @@ export default function Home({
       }
     });
   }, [auth]);
-  
 
-  
   // useEffect(() => {
   //   if (currentUser) {
   //     const q = query(
@@ -76,10 +74,10 @@ export default function Home({
   // }, [currentUser]);
 
   return (
-    currentUser && (
-      router.query["explore"] ?
+    currentUser &&
+    (router.query["explore"] ? (
       <Suggested suggestions={suggestions} />
-      :
+    ) : (
       <>
         <div className="min-h-section h-full flex justify-center items-center">
           <Head>
@@ -121,23 +119,32 @@ export default function Home({
                 <p className="capitalize text-gray-400 font-semibold tracking-wide text-sm">
                   Suggestions for you
                 </p>
-                <button className="capitalize text-xs font-[500]"
-                  onClick={() => router.push({pathname:router.asPath, query: { explore: "people" }}, "/explore/people")}
+                <button
+                  className="capitalize text-xs font-[500]"
+                  onClick={() =>
+                    router.push(
+                      { pathname: router.asPath, query: { explore: "people" } },
+                      "/explore/people"
+                    )
+                  }
                 >
                   see all
                 </button>
               </div>
 
               <div className="flex flex-col py-2">
-                {suggestions?.slice(0,5).map((suggestedUser) => (
-                  <SuggestedUser suggestedUser={suggestedUser} key={suggestedUser.id} />
+                {suggestions?.slice(0, 5).map((suggestedUser) => (
+                  <SuggestedUser
+                    suggestedUser={suggestedUser}
+                    key={suggestedUser.id}
+                  />
                 ))}
               </div>
             </div>
           </section>
         </div>
       </>
-    )
+    ))
   );
 }
 
@@ -146,40 +153,41 @@ Home.getLayout = function getLayout(page: ReactElement) {
 };
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  try {
-    // parse & verify token cookie => get user id
-    const cookies = nookies.get(ctx);
-    if (cookies.token) {
-      const verifiedToken = await verifyIdToken(cookies.token);
-      const userId = verifiedToken.uid;
+  if (ctx.req) {
+    try {
+      // parse & verify token cookie => get user id
+      const cookies = nookies.get(ctx);
+      if (cookies.token) {
+        const verifiedToken = await verifyIdToken(cookies.token);
+        const userId = verifiedToken.uid;
 
-      // pull out user info from database.
-      const userDocRef = doc(db, "users", userId);
-      const userDocSnap = await getDoc(userDocRef);
-      const userData = userDocSnap.data();
+        // pull out user info from database.
+        const userDocRef = doc(db, "users", userId);
+        const userDocSnap = await getDoc(userDocRef);
+        const userData = userDocSnap.data();
 
-      // get posts from serverside
+        // get posts from serverside
 
-      const posts = await getPostsByUserId(userData?.id);
+        const posts = await getPostsByUserId(userData?.id);
 
-      // get suggestions
+        // get suggestions
 
-      const suggestions = await getSuggestionsById(userData?.id);
-      return {
-        props: {
-          posts: posts,
-          suggestions: suggestions,
-        },
-      };
+        const suggestions = await getSuggestionsById(userData?.id);
+        return {
+          props: {
+            posts: posts,
+            suggestions: suggestions,
+          },
+        };
+      }
+    } catch (error: any | unknown) {
+      console.log(error.message);
     }
-  } catch (error: any | unknown) {
-    console.log(error.message);
   }
-
   return {
     props: {
       posts: [],
-      suggestions: []
+      suggestions: [],
     },
   };
 };

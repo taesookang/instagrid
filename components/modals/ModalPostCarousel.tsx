@@ -20,7 +20,7 @@ export const ModalPostCarousel: React.FC<Props> = ({ photos }) => {
         showDots={photos.length > 1 && true}
         removeArrowOnDeviceType={["mobile"]}
         containerClass="h-full w-full flex items-center bg-black"
-        itemClass="relative w-full aspect-square"
+        itemClass="relative h-full aspect-square"
         dotListClass="!mb-4"
         customLeftArrow={<CustomArrow theme="light" direction="left" />}
         customRightArrow={<CustomArrow theme="light" direction="right" />}

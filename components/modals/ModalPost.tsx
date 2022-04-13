@@ -59,7 +59,7 @@ export const ModalPost: React.FC<Props> = () => {
         });
       }}
       overlayClassName="modal-post__overlay"
-      className={`modal-post w-full sm:aspect-[5/3] max-h-full min-h-[450px] max-w-[1240px] rounded-xl animate-scaleDown overflow-hidden transtion-all duration-300 ease-in-out flex flex-col sm:flex-row`}
+      className={`modal-post w-full sm:aspect-[5/3] max-h-full min-h-[450px] max-w-[1250px] rounded-xl animate-scaleDown overflow-hidden transtion-all duration-300 ease-in-out flex flex-col sm:flex-row`}
     >
       <IoClose
         onClick={() => {
